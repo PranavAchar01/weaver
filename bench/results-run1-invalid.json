@@ -1,0 +1,515 @@
+{
+ "summary": {
+  "benchmark": "OWASP Benchmark for Python (BenchmarkPython) v0.1",
+  "benchmark_commit": "f1291485808b66e20ddb6b01b10dc71b3df8c8ba",
+  "selection_rule": "first 3 real-vulnerability cases per category by test number, from expectedresults-0.1.csv",
+  "verified_means": "Semgrep rescan of the file is clean and the file still compiles; these cases have no unit tests",
+  "semgrep": "1.180.0",
+  "rules": "weaver.yaml",
+  "patcher": "claude code cli (sonnet)",
+  "sampled": 42,
+  "flagged_by_semgrep": 29,
+  "not_flagged": 13,
+  "mended": 0,
+  "held": 29,
+  "median_seconds_to_mend": null,
+  "wall_seconds": 372.0,
+  "time_note": "seconds per case = patch written to rescan clean, 4 cases in parallel"
+ },
+ "cases": [
+  {
+   "case": "BenchmarkTest00001",
+   "category": "pathtraver",
+   "cwe": "22",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 26.12,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00002",
+   "category": "pathtraver",
+   "cwe": "22",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 27.5,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00003",
+   "category": "pathtraver",
+   "cwe": "22",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 28.74,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00018",
+   "category": "xpathi",
+   "cwe": "643",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 26.12,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00019",
+   "category": "xpathi",
+   "cwe": "643",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 25.31,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00025",
+   "category": "weakrand",
+   "cwe": "330",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 24.58,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00026",
+   "category": "weakrand",
+   "cwe": "330",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 25.31,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00027",
+   "category": "weakrand",
+   "cwe": "330",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 26.3,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00054",
+   "category": "hash",
+   "cwe": "328",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie",
+    "python.lang.security.insecure-hash-function"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 26.21,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00057",
+   "category": "hash",
+   "cwe": "328",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie",
+    "python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 26.54,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00058",
+   "category": "hash",
+   "cwe": "328",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie",
+    "python.lang.security.insecure-hash-algorithms.insecure-hash-algorithm-sha1"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 28.31,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00064",
+   "category": "securecookie",
+   "cwe": "614",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 26.8,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00065",
+   "category": "securecookie",
+   "cwe": "614",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 24.38,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00066",
+   "category": "securecookie",
+   "cwe": "614",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 24.98,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00067",
+   "category": "redirect",
+   "cwe": "601",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 23.91,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00068",
+   "category": "redirect",
+   "cwe": "601",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 24.28,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00072",
+   "category": "trustbound",
+   "cwe": "501",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 25.49,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00074",
+   "category": "codeinj",
+   "cwe": "94",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie",
+    "python.lang.security.audit.exec-detected"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 35.46,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00078",
+   "category": "deserialization",
+   "cwe": "502",
+   "semgrep_findings": 3,
+   "rules": [
+    "python.flask.security.audit.secure-set-cookie",
+    "python.flask.security.insecure-deserialization",
+    "python.lang.security.deserialization.pickle.avoid-pickle"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 38.0,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00096",
+   "category": "xss",
+   "cwe": "79",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00097",
+   "category": "xss",
+   "cwe": "79",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00098",
+   "category": "xss",
+   "cwe": "79",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00099",
+   "category": "sqli",
+   "cwe": "89",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00101",
+   "category": "xpathi",
+   "cwe": "643",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.lang.security.use-defused-xml",
+    "python.lang.security.use-defused-xml-parse"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 37.52,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00153",
+   "category": "trustbound",
+   "cwe": "501",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00159",
+   "category": "codeinj",
+   "cwe": "94",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.lang.security.audit.exec-detected"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 31.77,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00160",
+   "category": "codeinj",
+   "cwe": "94",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.lang.security.audit.exec-detected"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 28.69,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00164",
+   "category": "deserialization",
+   "cwe": "502",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.flask.security.insecure-deserialization",
+    "python.lang.security.deserialization.pickle.avoid-pickle"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 23.88,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00165",
+   "category": "cmdi",
+   "cwe": "78",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00166",
+   "category": "cmdi",
+   "cwe": "78",
+   "semgrep_findings": 1,
+   "rules": [
+    "python.lang.security.audit.subprocess-shell-true"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 37.23,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00167",
+   "category": "cmdi",
+   "cwe": "78",
+   "semgrep_findings": 3,
+   "rules": [
+    "python.flask.security.injection.subprocess-injection",
+    "python.lang.security.audit.subprocess-shell-true",
+    "python.lang.security.dangerous-subprocess-use"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 33.53,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00205",
+   "category": "xxe",
+   "cwe": "611",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.lang.security.use-defused-xml"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 39.9,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00258",
+   "category": "redirect",
+   "cwe": "601",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00260",
+   "category": "trustbound",
+   "cwe": "501",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00265",
+   "category": "ldapi",
+   "cwe": "90",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00266",
+   "category": "ldapi",
+   "cwe": "90",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00269",
+   "category": "deserialization",
+   "cwe": "502",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.flask.security.insecure-deserialization",
+    "python.lang.security.deserialization.avoid-pyyaml-load"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 22.56,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00283",
+   "category": "sqli",
+   "cwe": "89",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00284",
+   "category": "sqli",
+   "cwe": "89",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00294",
+   "category": "xxe",
+   "cwe": "611",
+   "semgrep_findings": 2,
+   "rules": [
+    "python.lang.security.use-defused-xml"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 36.06,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  },
+  {
+   "case": "BenchmarkTest00427",
+   "category": "ldapi",
+   "cwe": "90",
+   "semgrep_findings": 0,
+   "rules": [],
+   "status": "not_flagged"
+  },
+  {
+   "case": "BenchmarkTest00460",
+   "category": "xxe",
+   "cwe": "611",
+   "semgrep_findings": 6,
+   "rules": [
+    "python.django.security.injection.raw-html-format",
+    "python.flask.security.injection.raw-html-concat.raw-html-format",
+    "python.lang.security.use-defused-xml"
+   ],
+   "status": "held",
+   "attempts": 3,
+   "seconds": 44.04,
+   "reason": "patch rejected: /dev/null is a non-regular file and will be changed into a regular one if import writes a byte-compi"
+  }
+ ]
+}

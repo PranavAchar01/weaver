@@ -5,3 +5,6 @@ runs/
 target/
 node_modules/
 *.db
+bench/BenchmarkPython/
+.env*
+*.env

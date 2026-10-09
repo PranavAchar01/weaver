@@ -1,0 +1,3 @@
+poster proof v2
+bleed 3mm
+cmyk

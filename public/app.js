@@ -293,7 +293,7 @@ function stepSpider(dt) {
     if (a.type === 'pluck' && !a.fired && p > 0.45) {
       a.fired = true;
       const s = a.strand.seg, A = web.nodes[s.i][s.k], B = web.nodes[s.j][s.k];
-      ripple((A.x + B.x) / 2, (A.y + B.y) / 2, 7.5, 1);
+      ripple((A.x + B.x) / 2, (A.y + B.y) / 2, 9, 1.2);
     }
     if (p < 1) break;
     if (a.type === 'spin') { a.strand.torn = false; a.strand.spin = null; a.strand.fresh = now; }
@@ -372,7 +372,7 @@ function draw() {
   const C = P({ x: web.cx, y: web.cy });
 
   // anchors and frame
-  ctx.lineWidth = 1 * U; ctx.globalAlpha = 0.26 * gr;
+  ctx.lineWidth = 1 * U; ctx.globalAlpha = 0.26 * ease(clamp((grow - 0.45) / 0.3, 0, 1));
   for (const a of web.anchors) { const f = P(a.from); ctx.beginPath(); ctx.moveTo(f.x, f.y); ctx.lineTo(a.to.x, a.to.y); ctx.stroke(); }
   ctx.globalAlpha = 0.34 * gs;
   for (let i = 0; i < N; i++) { const a = P(radials[i].end), b = P(radials[(i + 1) % N].end); const m = { x: (a.x + b.x) / 2, y: (a.y + b.y) / 2 }; const sx = web.cx, sy = web.cy; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.quadraticCurveTo(m.x + (sx - m.x) * 0.05, m.y + (sy - m.y) * 0.05, b.x, b.y); ctx.stroke(); }
@@ -552,7 +552,7 @@ function handle(ev, instant) {
       const t = tears.get(ev.id); if (!t) break;
       enqueue({ type: 'pluck', strand: t.strand, onStart: () => {
         nOpen--; nMended++; mendTimes.push(ev.seconds); setNums();
-        if (t.li) { t.li.className = 'mended'; t.li.querySelector('.steps').textContent = ev.verify; t.li.querySelector('.meta').textContent = `${ev.seconds.toFixed(1)} s  ${ev.commit}`; }
+        if (t.li) { t.li.className = 'mended'; t.li.querySelector('.steps').textContent = ev.verify; t.li.querySelector('.meta').textContent = [ev.backend, ev.ledger === 's3' ? 'ledger: s3' : '', `${ev.seconds.toFixed(1)} s`, ev.commit].filter(Boolean).join(' · '); }
         if (nOpen === 0) status('Web intact. Still watching.');
       } });
       break;
@@ -587,7 +587,7 @@ function pump() {
     while (replayIdx < replayEvents.length && LEAD + (replayEvents[replayIdx].t - replayT0) / SPEED <= now) handle(replayEvents[replayIdx++], false);
     if (!outroDone && OUTRO != null && now >= OUTRO) {
       outroDone = true;
-      fade($('ledger'), 1, 0, 0.8); fade($('closing'), 0, 1, 1.0, 0.6); fade($('commit'), 1, 0, 0.6);
+      fade($('ledger'), 1, 0, 0.6); fade($('closing'), 0, 1, 0.8, 0.35); fade($('commit'), 1, 0, 0.6);
     }
   }
   if (commitShownAt > 0 && !outroDone && now - commitShownAt > 9) { fade($('commit'), 1, 0, 0.8); commitShownAt = -99; }
@@ -618,6 +618,16 @@ async function boot() {
     replayT0 = replayEvents.find((e) => e.type === 'scan_start').t;
     while (replayIdx < replayEvents.length && replayEvents[replayIdx].t <= replayT0 && replayEvents[replayIdx].type !== 'scan_start') handle(replayEvents[replayIdx++], true);
     $('corner').textContent = `recorded run, replayed at ${SPEED}x`;
+    try {                                   // independent check: numbers come straight from bench/results.json
+      const b = (await (await fetch('/bench/results.json')).json()).summary;
+      $('bench').innerHTML =
+        `<b>Independent check.</b> ${esc(b.benchmark.replace(/ \(.*/, ''))}, code we did not write. ` +
+        `Sample: ${b.sampled} real-vulnerability cases, first 3 per category. ` +
+        `Semgrep found the benchmark's vulnerability in ${b.flagged_in_benchmark_category}. ` +
+        `Weaver mended ${b.mended_in_benchmark_category} of ${b.flagged_in_benchmark_category}; ${b.held_in_benchmark_category} held for a human. ` +
+        `In ${b.flagged_other_issue_only} more Semgrep flagged only a different issue, and in ${b.not_flagged} nothing, so those ${b.flagged_other_issue_only + b.not_flagged} stay open. ` +
+        `<i>Mended there means rescan clean and the file compiles. Those cases have no unit tests.</i>`;
+    } catch (e) { $('bench').textContent = ''; }
   } else {
     const opened = Date.now() / 1000;
     const es = new EventSource('/events');

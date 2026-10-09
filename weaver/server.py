@@ -26,6 +26,8 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
+from . import aws
+
 ROOT = Path(__file__).resolve().parent.parent
 TARGET = Path(os.environ.get("WEAVER_TARGET", ROOT / "target")).resolve()
 RULES = Path(os.environ.get("WEAVER_RULES", ROOT / "rules" / "weaver.yaml"))
@@ -225,11 +227,16 @@ def generate_patch(
     listing = "\n".join(
         f"- line {f['line']}: {f['rule']}: {f['message'][:300]}" for f in findings
     )
-    reply, meta = ask_claude(
-        PROMPT.format(
-            path=path, findings=listing, feedback=feedback, content=content.rstrip("\n")
-        )
+    prompt = PROMPT.format(
+        path=path, findings=listing, feedback=feedback, content=content.rstrip("\n")
     )
+    try:  # Amazon Bedrock first; any refusal or error falls back to the local CLI
+        reply = aws.bedrock_converse(SYSTEM, prompt)
+        meta = {"model": aws.BEDROCK_MODEL, "backend": "bedrock"}
+        extract_file(reply)
+    except Exception:
+        reply, meta = ask_claude(prompt)
+        meta["backend"] = "claude cli"
     return {
         "based_on": sha(content),
         "content": extract_file(reply),
@@ -385,6 +392,7 @@ class Weaver:
                 added=sum(x.startswith("+") for x in d),
                 seconds=patch["seconds"],
                 model=patch["model"],
+                backend=patch["backend"],
             )
 
             left = semgrep(path)
@@ -443,14 +451,36 @@ class Weaver:
                 commit = git("rev-parse", "--short", "HEAD")
                 self.own_commits.add(git("rev-parse", "HEAD"))
                 self.tears.pop(path, None)
+                seconds = round(time.time() - tear["t"], 2)
+                key = aws.ledger_put(
+                    {
+                        "repo": TARGET.name,
+                        "path": path,
+                        "rules": tear["rules"],
+                        "commit": git("rev-parse", "HEAD"),
+                        "diff_sha256": hashlib.sha256("\n".join(d).encode()).hexdigest(),
+                        "lines_removed": sum(x.startswith("-") for x in d),
+                        "lines_added": sum(x.startswith("+") for x in d),
+                        "verification": checks,
+                        "attempts": attempt,
+                        "patcher_backend": patch["backend"],
+                        "patcher_model": patch["model"],
+                        "torn_at": tear["t"],
+                        "mended_at": round(time.time(), 3),
+                        "seconds_to_mend": seconds,
+                    }
+                )
                 emit(
                     "mended",
                     id=tid,
                     path=path,
                     commit=commit,
                     attempts=attempt,
-                    seconds=round(time.time() - tear["t"], 2),
+                    seconds=seconds,
                     verify=" · ".join(checks),
+                    backend=patch["backend"],
+                    ledger="s3" if key else "local",
+                    ledger_key=key,
                 )
                 return
             # verification failed: roll the strand back before anything else happens
@@ -484,6 +514,8 @@ class Weaver:
             semgrep=semgrep_version(),
             rules=RULES.name,
             patcher=f"claude code cli ({MODEL})",
+            bedrock=aws.bedrock_probe(),
+            ledger="s3" if aws.ledger_bucket() else "local",
         )
         last = None
         while True:
@@ -542,6 +574,11 @@ async def sse():
 def replay(name: str):
     path = ROOT / "demo" / os.path.basename(name)
     return FileResponse(path, media_type="text/plain")
+
+
+@app.get("/bench/results.json")
+def bench_results():
+    return FileResponse(ROOT / "bench" / "results.json", media_type="application/json")
 
 
 @app.on_event("startup")
