@@ -1,0 +1,13 @@
+.venv
+.git
+.pytest_cache
+.ruff_cache
+target
+target-seed
+runs
+events.jsonl
+demo
+bench/BenchmarkPython
+*.mp4
+.env*
+*.env

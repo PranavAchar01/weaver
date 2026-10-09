@@ -1,0 +1,10 @@
+{
+  "redirects": [
+    {
+      "source": "/",
+      "missing": [{ "type": "query", "key": "replay" }],
+      "destination": "/?replay=real-run.jsonl&speed=2",
+      "permanent": false
+    }
+  ]
+}
