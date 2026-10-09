@@ -1,0 +1,6 @@
+[project]
+name = "weaver"
+version = "0.1.0"
+description = "Continuous remediation: Semgrep finds it, Weaver mends it, tests prove it."
+requires-python = ">=3.12"
+dependencies = ["fastapi", "uvicorn", "flask", "pyyaml", "pytest", "playwright"]

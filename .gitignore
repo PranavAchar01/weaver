@@ -1,0 +1,7 @@
+.venv/
+__pycache__/
+events.jsonl
+runs/
+target/
+node_modules/
+*.db
