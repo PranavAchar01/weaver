@@ -490,7 +490,7 @@ function ledgerEntry(t, ev) {
   li.innerHTML =
     `<div class="l1"><span class="rule">${esc(t.ev.rule)}${more}</span><span class="where">${esc(t.ev.path)}:${t.ev.lines.join(', ')}</span></div>` +
     `<pre>${lines.map((l) => `<span class="${l[0] === '-' ? 'del' : 'add'}">${esc(l[0] + ' ' + l.slice(1).trim())}</span>`).join('')}</pre>` +
-    `<div class="ver"><span class="steps">verifying</span><span class="meta">${ev.attempt > 1 ? 'attempt ' + ev.attempt : ''}</span></div>`;
+    `<div class="ver"><span class="steps">verifying</span><span class="meta">${[ev.backend, ev.attempt > 1 ? 'attempt ' + ev.attempt : ''].filter(Boolean).join(' · ')}</span></div>`;
   if (!t.li) {
     t.li = li; $('ledger').appendChild(li); fade(li, 0, 1, 0.5, 0, 6);
     const box = $('ledger');
@@ -507,6 +507,7 @@ function handle(ev, instant) {
   switch (ev.type) {
     case 'init':
       status(`watching ./${ev.repo} with ${ev.semgrep ? 'Semgrep ' + ev.semgrep : 'Semgrep'}`);
+      $('engine').textContent = `Semgrep ${ev.semgrep || ''}` + (ev.rule_count ? ` · ${ev.rule_count} registry rules` : '');
       break;
     case 'tree':
       buildWeb(ev.tree);
@@ -557,6 +558,17 @@ function handle(ev, instant) {
       } });
       break;
     }
+    case 'rule_written': {
+      const t = tears.get(ev.id); if (!t) break;
+      enqueue({ type: 'dom', onStart: () => {
+        if (!t.li || t.li.querySelector('.note')) return;
+        const n = document.createElement('div'); n.className = 'note'; n.textContent = `rule written: ${ev.file}`;
+        t.li.appendChild(n); fade(n, 0, 0.8, 0.5);
+        const box = $('ledger');
+        while (box.scrollHeight > box.clientHeight + 2 && box.children.length > 1) box.removeChild(box.firstChild);
+      } });
+      break;
+    }
     case 'held': {
       const t = tears.get(ev.id); if (!t) break;
       enqueue({ type: 'dom', onStart: () => {
@@ -579,11 +591,29 @@ function handle(ev, instant) {
 const later = [];
 
 /* ------------------------------------------------------------ feeds */
+const INTRO = Q.has('intro') ? parseFloat(Q.get('intro') || '6') : 0;   // seconds of terminal card before the web
+let termLines = [];
+function intro() {                        // the command a user types, then the lines the CLI really printed
+  if (!INTRO) return;
+  const el = $('intro');
+  if (now >= INTRO) { el.style.display = 'none'; return; }
+  el.style.display = 'block';
+  el.style.opacity = clamp(now / 0.35, 0, 1) * clamp((INTRO - now) / 0.3, 0, 1);
+  const typed = (s, t0, cps) => s.slice(0, Math.max(0, Math.floor((now - t0) * cps)));
+  const c1 = 'cd my-app', c2 = 'weaver watch .';
+  const t1 = 0.7, t2 = 1.75, tOut = 3.15;
+  const cur = (on) => (on && Math.floor(now * 2.5) % 2 === 0 ? '\u2588' : '');
+  let html = '$ ' + esc(typed(c1, t1, 16)) + cur(now < t2 - 0.25);
+  if (now >= t2 - 0.25) html += '\n$ ' + esc(typed(c2, t2, 16)) + cur(now < tOut);
+  termLines.forEach((l, i) => { if (now >= tOut + i * 0.38) html += `\n<span class="out">${esc(l)}</span>`; });
+  $('term').innerHTML = html;
+}
 const BROLL = 3.7;                       // seconds the benchmark page stays up before the score
 let benchOK = null;
 let replayEvents = null, replayT0 = 0, replayIdx = 0, outroDone = false;
 
 function pump() {
+  intro();
   for (let i = later.length - 1; i >= 0; i--) if (now >= later[i].at) { later[i].fn(); later.splice(i, 1); }
   if (replayEvents) {
     while (replayIdx < replayEvents.length && LEAD + (replayEvents[replayIdx].t - replayT0) / SPEED <= now) handle(replayEvents[replayIdx++], false);
@@ -621,13 +651,24 @@ async function boot() {
     replayT0 = replayEvents.find((e) => e.type === 'scan_start').t;
     while (replayIdx < replayEvents.length && replayEvents[replayIdx].t <= replayT0 && replayEvents[replayIdx].type !== 'scan_start') handle(replayEvents[replayIdx++], true);
     $('corner').textContent = `recorded run, replayed at ${SPEED}x`;
+    if (INTRO) try { termLines = (await (await fetch('/replay/terminal.txt')).text()).trim().split('\n').slice(0, 3); } catch (e) { termLines = []; }
     try {                                   // independent check: numbers come straight from bench/results.json
       const b = (await (await fetch('/bench/results.json')).json()).summary;
+      const pct = (a, n) => Math.round((100 * a) / n);
+      let versus = '';
+      try {                                 // measured baseline: Semgrep autofix alone on the same cases
+        const base = (await (await fetch('/bench/baseline.json')).json()).summary;
+        if (base.cases === b.flagged_in_benchmark_category) versus =
+          `<p class="versus"><span class="dim">Semgrep autofix alone</span><span class="dim r">${base.fixed} / ${base.cases}</span><span class="dim r">${pct(base.fixed, base.cases)}%</span>` +
+          `<span>Weaver</span><span class="r">${b.mended_in_benchmark_category} / ${b.flagged_in_benchmark_category}</span><span class="r">${pct(b.mended_in_benchmark_category, b.flagged_in_benchmark_category)}%</span></p>`;
+      } catch (e) { versus = ''; }
       benchOK = b.held_in_benchmark_category === 0 && b.mended_in_benchmark_category === b.flagged_in_benchmark_category;
       $('score').innerHTML =
         `<p class="tag">Weaver. Semgrep finds it. Weaver mends it.</p>` +
-        `<p class="big">${b.mended_in_benchmark_category} / ${b.flagged_in_benchmark_category}</p>` +
+        `<p class="big"><span>${b.mended_in_benchmark_category} / ${b.flagged_in_benchmark_category}</span><small>${pct(b.mended_in_benchmark_category, b.flagged_in_benchmark_category)}%</small></p>` +
         `<p class="what">${benchOK ? 'Every vulnerability' : 'Vulnerabilities'} Semgrep found in our OWASP Benchmark sample, mended.</p>` +
+        (b.held_in_benchmark_category ? `<p class="heldline">The ${b.held_in_benchmark_category} it could not verify ${b.held_in_benchmark_category === 1 ? 'was' : 'were'} rolled back and held for a human.</p>` : '') +
+        versus +
         `<p class="limit">${b.sampled}-case sample. ${b.flagged_other_issue_only + b.not_flagged} that Semgrep missed stay open. Mended = rescan clean and compiles.</p>`;
     } catch (e) { benchOK = null; }
   } else {

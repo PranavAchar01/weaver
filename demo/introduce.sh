@@ -1,7 +1,7 @@
 #!/bin/sh
 # Lands one new commit in the target repo that introduces a SQL injection.
 # Weaver is not told about it; the watcher has to notice.
-cd "$(dirname "$0")/../target"
+cd "${WEAVER_REPO:-$(dirname "$0")/../target}"
 python3 - <<'PY'
 import pathlib
 p = pathlib.Path("routes/orders.py")

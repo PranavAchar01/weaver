@@ -40,44 +40,78 @@ These cases have no unit tests. So here "mended" means two things only: a
 Semgrep rescan of the patched file is clean, and the file still compiles. It
 is not test-verified, and nobody ran an exploit against the patched cases.
 
-## Result
+## Result (run 3, the shipped engine: Semgrep autofix first, then the LLM)
 
 | | cases |
 |---|---|
 | Sampled real-vulnerability cases | 42 |
 | Semgrep flagged the file at all | 29 |
 | Semgrep flagged a rule in the benchmark's own category | 17 |
-| of those, mended (rescan clean, compiles) | 17 |
-| of those, held for a human | 0 |
+| of those, mended (rescan clean, compiles) | 16 (94%) |
+| of those, held for a human | 1 |
 | Semgrep flagged only a different issue | 12 |
 | Semgrep flagged nothing | 13 |
 
-Median time to mend: 13.1 s per case (patch written to rescan clean, 4 cases
-in parallel, 24 on the first attempt and 5 on the second). Whole run: 268.9 s.
+Of the 16: 1 was fixed by Semgrep's own autofix (BenchmarkTest00166) and 15 by
+the LLM patch. The held case is BenchmarkTest00167 (command injection): the
+autofix did not clear it and three LLM patches in a row still left
+`subprocess-injection` on rescan, so Weaver rolled the file back and held it.
+
+Median time to mend: 14.3 s per case (4 cases in parallel). Whole run: 289.6 s.
+
+## Baseline: Semgrep autofix alone
+
+Same 17 cases, same rules, no LLM (`bench/baseline.py`, results in
+`bench/baseline.json`):
+
+```
+semgrep scan --config rules/weaver.yaml --autofix --quiet --metrics=off --disable-version-check testcode/<case>.py
+```
+
+then the same check: rescan clean and the file compiles.
+
+| | fixed | of | |
+|---|---|---|---|
+| Semgrep autofix alone | 1 | 17 | 6% |
+| Weaver (autofix first, then LLM, verify, roll back) | 16 | 17 | 94% |
+
+Only 4 of the 17 cases had a finding whose rule ships a fix at all. This is
+the only comparison we ran. We did not run any other tool, so we make no claim
+about any other tool.
+
+## Earlier run, kept for the record
+
+Run 2 (`results-run2-llm-only.json`), before the engine tried Semgrep's
+autofix first: 17 of 17 in the benchmark category mended, 0 held, median
+13.1 s. Run 3 is the one on screen because it is the code that ships. The
+difference is one case (00167) where the LLM's three patches did not pass the
+rescan this time. We did not re-roll run 3 to get the missing case back.
 
 Read this plainly:
 
-- Against the benchmark's ground truth, Weaver addressed 17 of 42 sampled
-  vulnerabilities. The other 25 stay open because Semgrep, with these rules,
-  did not find them. Weaver cannot mend what the scanner does not find.
+- Against the benchmark's ground truth, Weaver addressed 16 of 42 sampled
+  vulnerabilities. 25 stay open because Semgrep, with these rules, did not
+  find them, and 1 is held. Weaver cannot mend what the scanner does not find.
 - In 12 cases Semgrep flagged only something else in the file (11 times a
   cookie set without secure flags, once an XML parser rule on an XPath case).
-  Weaver cleared those findings too, so all 29 flagged files are rescan-clean,
-  but the benchmark's vulnerability in those 12 files is still there. They are
-  not counted as mended on screen.
+  Weaver cleared those findings too, but the benchmark's vulnerability in
+  those 12 files is still there. They are not counted as mended on screen.
 - Not flagged at all: xss 3, sqli 3, ldapi 3, trustbound 2, cmdi 1, redirect 1.
 - Flagged for a different issue only: pathtraver 3, weakrand 3, xpathi 3,
   redirect 2, trustbound 1.
 - The split between "benchmark category" and "different issue" comes from a
   mapping of rule ids to categories that we wrote (`classify.py`). It was added
-  after the run, when the per-case rule list showed that many hits were the
+  after run 2, when the per-case rule list showed that many hits were the
   cookie rule. It changes no result, only how the 29 are reported.
+- The rule-writing memory (`.weaver/rules`) is not part of this benchmark run.
 
 ## Files
 
 - `results.json`: summary plus one record per case (rules fired, status,
   attempts, seconds, lines changed, whether a rule matches the category).
-- `run.log`: output of the run.
+- `baseline.json`, `baseline.py`: the Semgrep-autofix-alone baseline.
+- `results-run2-llm-only.json`: run 2, LLM patch only.
+- `run.log`, `run3.log`: output of runs 2 and 3.
 - `results-run1-invalid.json`: an earlier run where every case was marked
   held. That was a bug in our harness (the compile check wrote to a bad
   path and raised), not a real result. It is kept so the record is complete.

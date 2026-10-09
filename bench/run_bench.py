@@ -39,6 +39,19 @@ def mend(case, findings):
     path = REPO / "testcode" / f"{case['case']}.py"
     original = path.read_text()
     t0, feedback, reason = time.time(), "", ""
+    if any(f["fix"] for f in findings):  # same order as the engine: Semgrep's own fix first
+        fix = W.semgrep_autofix(str(path), original)
+        if fix:
+            try:
+                compile(fix["content"], str(path), "exec")
+                path.write_text(fix["content"])
+                if not W.semgrep(str(path)):
+                    return {"status": "mended", "fixed_by": "semgrep autofix", "attempts": 1,
+                            "seconds": round(time.time() - t0, 2),
+                            "lines_changed": len(W.diff_lines(original, fix["content"]))}
+            except SyntaxError:
+                pass
+            path.write_text(original)
     for attempt in range(1, MAX_ATTEMPTS + 1):
         try:
             patch = W.generate_patch(f"testcode/{path.name}", original, findings, feedback)
@@ -54,7 +67,7 @@ def mend(case, findings):
             continue
         left = W.semgrep(str(path))
         if not left:
-            return {"status": "mended", "attempts": attempt, "seconds": round(time.time() - t0, 2),
+            return {"status": "mended", "fixed_by": patch["backend"], "attempts": attempt, "seconds": round(time.time() - t0, 2),
                     "lines_changed": len(W.diff_lines(original, new))}
         path.write_text(original)
         reason = f"rescan still finds {left[0]['rule']}"
@@ -87,6 +100,9 @@ def main():
         "semgrep": W.semgrep_version(), "rules": W.RULES.name, "patcher": f"claude code cli ({W.MODEL})",
         "sampled": len(cases), "flagged_by_semgrep": len(flagged), "not_flagged": len(cases) - len(flagged),
         "mended": len(mended), "held": len(flagged) - len(mended),
+        "engine": "Semgrep autofix first, LLM patch only when there is no fix or it does not verify",
+        "mended_by_semgrep_autofix": sum(r.get("fixed_by") == "semgrep autofix" for r in mended),
+        "mended_by_llm": sum(r.get("fixed_by") != "semgrep autofix" for r in mended),
         "median_seconds_to_mend": round(statistics.median(r["seconds"] for r in mended), 1) if mended else None,
         "wall_seconds": round(time.time() - started, 1),
         "time_note": "seconds per case = patch written to rescan clean, 4 cases in parallel",

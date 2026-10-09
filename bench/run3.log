@@ -1,0 +1,20 @@
+{
+ "benchmark": "OWASP Benchmark for Python (BenchmarkPython) v0.1",
+ "benchmark_commit": "f1291485808b66e20ddb6b01b10dc71b3df8c8ba",
+ "selection_rule": "first 3 real-vulnerability cases per category by test number, from expectedresults-0.1.csv",
+ "verified_means": "Semgrep rescan of the file is clean and the file still compiles; these cases have no unit tests",
+ "semgrep": "1.180.0",
+ "rules": "weaver.yaml",
+ "patcher": "claude code cli (sonnet)",
+ "sampled": 42,
+ "flagged_by_semgrep": 29,
+ "not_flagged": 13,
+ "mended": 28,
+ "held": 1,
+ "engine": "Semgrep autofix first, LLM patch only when there is no fix or it does not verify",
+ "mended_by_semgrep_autofix": 1,
+ "mended_by_llm": 27,
+ "median_seconds_to_mend": 14.3,
+ "wall_seconds": 289.6,
+ "time_note": "seconds per case = patch written to rescan clean, 4 cases in parallel"
+}

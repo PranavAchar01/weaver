@@ -1,0 +1,185 @@
+{
+ "summary": {
+  "what": "Semgrep autofix alone, no LLM, on the cases where Semgrep found the benchmark's vulnerability",
+  "command": "semgrep scan --config rules/weaver.yaml --autofix --quiet --metrics=off --disable-version-check testcode/<case>.py",
+  "fixed_means": "after autofix the Semgrep rescan of the file is clean and the file compiles (same check as Weaver's mends in this sample)",
+  "semgrep": "1.180.0",
+  "rules": "weaver.yaml",
+  "cases": 17,
+  "fixed": 1,
+  "percent": 6,
+  "cases_with_any_semgrep_fix": 4
+ },
+ "cases": [
+  {
+   "case": "BenchmarkTest00054",
+   "category": "hash",
+   "findings": 2,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00057",
+   "category": "hash",
+   "findings": 2,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00058",
+   "category": "hash",
+   "findings": 2,
+   "findings_with_semgrep_fix": 1,
+   "file_changed": true,
+   "compiles": true,
+   "findings_after": 1,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00064",
+   "category": "securecookie",
+   "findings": 2,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00065",
+   "category": "securecookie",
+   "findings": 2,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00066",
+   "category": "securecookie",
+   "findings": 2,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00074",
+   "category": "codeinj",
+   "findings": 2,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00078",
+   "category": "deserialization",
+   "findings": 3,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 3,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00159",
+   "category": "codeinj",
+   "findings": 1,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 1,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00160",
+   "category": "codeinj",
+   "findings": 1,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 1,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00164",
+   "category": "deserialization",
+   "findings": 2,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00166",
+   "category": "cmdi",
+   "findings": 1,
+   "findings_with_semgrep_fix": 1,
+   "file_changed": true,
+   "compiles": true,
+   "findings_after": 0,
+   "fixed": true
+  },
+  {
+   "case": "BenchmarkTest00167",
+   "category": "cmdi",
+   "findings": 3,
+   "findings_with_semgrep_fix": 1,
+   "file_changed": true,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00205",
+   "category": "xxe",
+   "findings": 2,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00269",
+   "category": "deserialization",
+   "findings": 2,
+   "findings_with_semgrep_fix": 1,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00294",
+   "category": "xxe",
+   "findings": 2,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 2,
+   "fixed": false
+  },
+  {
+   "case": "BenchmarkTest00460",
+   "category": "xxe",
+   "findings": 6,
+   "findings_with_semgrep_fix": 0,
+   "file_changed": false,
+   "compiles": true,
+   "findings_after": 6,
+   "fixed": false
+  }
+ ]
+}

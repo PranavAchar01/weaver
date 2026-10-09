@@ -10,14 +10,17 @@
   "sampled": 42,
   "flagged_by_semgrep": 29,
   "not_flagged": 13,
-  "mended": 29,
-  "held": 0,
-  "median_seconds_to_mend": 13.1,
-  "wall_seconds": 268.9,
+  "mended": 28,
+  "held": 1,
+  "engine": "Semgrep autofix first, LLM patch only when there is no fix or it does not verify",
+  "mended_by_semgrep_autofix": 1,
+  "mended_by_llm": 27,
+  "median_seconds_to_mend": 14.3,
+  "wall_seconds": 289.6,
   "time_note": "seconds per case = patch written to rescan clean, 4 cases in parallel",
   "flagged_in_benchmark_category": 17,
-  "mended_in_benchmark_category": 17,
-  "held_in_benchmark_category": 0,
+  "mended_in_benchmark_category": 16,
+  "held_in_benchmark_category": 1,
   "flagged_other_issue_only": 12,
   "mended_other_issue_only": 12,
   "category_match_note": "a case counts as flagged in the benchmark category only when a Semgrep rule that fired belongs to that case's category (mapping in bench/classify.py); where only a different rule fired, the benchmark's vulnerability is still there"
@@ -32,8 +35,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 13.58,
+   "seconds": 12.58,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -46,8 +50,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.93,
+   "seconds": 12.27,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -60,8 +65,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 13.84,
+   "seconds": 17.03,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -74,8 +80,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 13.01,
+   "seconds": 11.99,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -88,8 +95,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.39,
+   "seconds": 23.5,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -102,8 +110,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.99,
+   "seconds": 11.11,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -116,8 +125,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.43,
+   "seconds": 22.64,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -130,8 +140,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 13.46,
+   "seconds": 12.08,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -145,8 +156,9 @@
     "python.lang.security.insecure-hash-function"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.95,
+   "seconds": 13.27,
    "lines_changed": 5,
    "rule_matches_category": true
   },
@@ -160,8 +172,9 @@
     "python.lang.security.insecure-hash-algorithms-md5.insecure-hash-algorithm-md5"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.3,
+   "seconds": 25.53,
    "lines_changed": 5,
    "rule_matches_category": true
   },
@@ -175,8 +188,9 @@
     "python.lang.security.insecure-hash-algorithms.insecure-hash-algorithm-sha1"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.46,
+   "seconds": 20.29,
    "lines_changed": 5,
    "rule_matches_category": true
   },
@@ -189,9 +203,10 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 13.59,
-   "lines_changed": 8,
+   "seconds": 12.4,
+   "lines_changed": 10,
    "rule_matches_category": true
   },
   {
@@ -203,8 +218,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 13.05,
+   "seconds": 12.86,
    "lines_changed": 10,
    "rule_matches_category": true
   },
@@ -217,9 +233,10 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 14.66,
-   "lines_changed": 8,
+   "seconds": 14.09,
+   "lines_changed": 10,
    "rule_matches_category": true
   },
   {
@@ -231,8 +248,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 11.69,
+   "seconds": 12.94,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -245,8 +263,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.56,
+   "seconds": 13.35,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -259,8 +278,9 @@
     "python.flask.security.audit.secure-set-cookie"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 10.69,
+   "seconds": 13.8,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -274,8 +294,9 @@
     "python.lang.security.audit.exec-detected"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 15.68,
+   "seconds": 15.87,
    "lines_changed": 6,
    "rule_matches_category": true
   },
@@ -290,8 +311,9 @@
     "python.lang.security.deserialization.pickle.avoid-pickle"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 18.71,
+   "seconds": 18.96,
    "lines_changed": 9,
    "rule_matches_category": true
   },
@@ -341,8 +363,9 @@
     "python.lang.security.use-defused-xml-parse"
    ],
    "status": "mended",
-   "attempts": 2,
-   "seconds": 35.6,
+   "fixed_by": "claude cli",
+   "attempts": 1,
+   "seconds": 26.97,
    "lines_changed": 3,
    "rule_matches_category": false
   },
@@ -364,8 +387,9 @@
     "python.lang.security.audit.exec-detected"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 13.58,
+   "seconds": 14.43,
    "lines_changed": 4,
    "rule_matches_category": true
   },
@@ -378,8 +402,9 @@
     "python.lang.security.audit.exec-detected"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.37,
+   "seconds": 13.51,
    "lines_changed": 4,
    "rule_matches_category": true
   },
@@ -393,8 +418,9 @@
     "python.lang.security.deserialization.pickle.avoid-pickle"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 12.59,
+   "seconds": 15.5,
    "lines_changed": 5,
    "rule_matches_category": true
   },
@@ -416,9 +442,10 @@
     "python.lang.security.audit.subprocess-shell-true"
    ],
    "status": "mended",
+   "fixed_by": "semgrep autofix",
    "attempts": 1,
-   "seconds": 15.77,
-   "lines_changed": 10,
+   "seconds": 11.54,
+   "lines_changed": 2,
    "rule_matches_category": true
   },
   {
@@ -431,10 +458,10 @@
     "python.lang.security.audit.subprocess-shell-true",
     "python.lang.security.dangerous-subprocess-use"
    ],
-   "status": "mended",
-   "attempts": 2,
-   "seconds": 29.85,
-   "lines_changed": 3,
+   "status": "held",
+   "attempts": 3,
+   "seconds": 66.73,
+   "reason": "rescan still finds python.flask.security.injection.subprocess-injection",
    "rule_matches_category": true
   },
   {
@@ -446,8 +473,9 @@
     "python.lang.security.use-defused-xml"
    ],
    "status": "mended",
-   "attempts": 2,
-   "seconds": 32.32,
+   "fixed_by": "claude cli",
+   "attempts": 1,
+   "seconds": 18.7,
    "lines_changed": 12,
    "rule_matches_category": true
   },
@@ -497,8 +525,9 @@
     "python.lang.security.deserialization.avoid-pyyaml-load"
    ],
    "status": "mended",
+   "fixed_by": "claude cli",
    "attempts": 1,
-   "seconds": 10.09,
+   "seconds": 21.66,
    "lines_changed": 3,
    "rule_matches_category": true
   },
@@ -529,9 +558,10 @@
     "python.lang.security.use-defused-xml"
    ],
    "status": "mended",
-   "attempts": 2,
-   "seconds": 33.05,
-   "lines_changed": 13,
+   "fixed_by": "claude cli",
+   "attempts": 1,
+   "seconds": 21.55,
+   "lines_changed": 12,
    "rule_matches_category": true
   },
   {
@@ -554,9 +584,10 @@
     "python.lang.security.use-defused-xml"
    ],
    "status": "mended",
-   "attempts": 2,
-   "seconds": 36.23,
-   "lines_changed": 22,
+   "fixed_by": "claude cli",
+   "attempts": 1,
+   "seconds": 16.84,
+   "lines_changed": 21,
    "rule_matches_category": true
   }
  ]
