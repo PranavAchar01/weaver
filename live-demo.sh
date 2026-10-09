@@ -5,7 +5,7 @@ set -e
 UP=mathandy/svgpathtools
 ME=$(gh api user --jq .login)
 WEAVER=${WEAVER:-$HOME/helloworld/weaver}
-PORT=8766
+PORT=$(python3 -c 'import socket;s=socket.socket();s.bind(("127.0.0.1",0));print(s.getsockname()[1])')
 WORK=$(mktemp -d)/svgpathtools
 BR=weaver/mend-$(date +%H%M%S)
 T0=$(date +%s)
@@ -23,16 +23,18 @@ printf 'svgpathtools/parser.py\nsvgpathtools/paths2svg.py\nsvgpathtools/svg_io_s
 
 (cd $WEAVER && exec uv run weaver watch $WORK --lang python --no-tests --port $PORT) &
 PID=$!
-stop() { kill $PID 2>/dev/null; lsof -ti tcp:$PORT | xargs kill 2>/dev/null; true; }
+# the open browser tab holds a stream, so the server ignores a plain kill: ask, then force
+stop() { kill $PID 2>/dev/null; sleep 2; pkill -9 -P $PID 2>/dev/null; kill -9 $PID 2>/dev/null; true; }
 trap stop EXIT
 sleep 4
 open "http://127.0.0.1:$PORT"
 
-# done when at least one mend is committed and the event log has been quiet for 40 s
+# done when at least one mend is committed and the event log has been quiet for 20 s
 last=0; quiet=0
 while :; do
   sleep 5
-  n=$(wc -l < .weaver/events.jsonl 2>/dev/null || echo 0)
+  lsof -ti tcp:$PORT -sTCP:LISTEN >/dev/null || { echo "weaver-demo: the Weaver server is not running, stopping"; exit 1; }
+  n=$( [ -f .weaver/events.jsonl ] && wc -l < .weaver/events.jsonl || echo 0)
   mends=$(git rev-list --count $START..HEAD)
   if [ "$n" = "$last" ]; then quiet=$((quiet+5)); else quiet=0; last=$n; fi
   echo "weaver-demo: $mends mend commits, $n events"
