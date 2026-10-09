@@ -1,6 +1,6 @@
 #!/bin/zsh
 # Weaver, end to end on a fresh open source repo: fork, clone, scan, mend, verify, open the pull request.
-# Usage: ./live-demo.sh            (needs: gh logged in, semgrep, uv, claude)
+# Usage: ./panda-svg.sh            (needs: gh logged in, semgrep, uv, claude)
 set -e
 UP=mathandy/svgpathtools
 ME=$(gh api user --jq .login)
