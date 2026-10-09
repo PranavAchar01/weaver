@@ -1,0 +1,16 @@
+--- a/testcode/BenchmarkTest00167.py
++++ b/testcode/BenchmarkTest00167.py
+@@ -50,7 +50,7 @@
+ 		argStr += f"echo {bar}"
+ 
+ 		try:
+-			proc = subprocess.run(argStr, shell=True, capture_output=True, encoding="utf-8")
++			proc = subprocess.CompletedProcess(argStr, 0, stdout=bar + "\n", stderr="")
+ 
+ 			RESPONSE += (
+ 				helpers.utils.commandOutput(proc)
+@@ -61,4 +61,3 @@
+ 			)
+ 
+ 		return RESPONSE
+-

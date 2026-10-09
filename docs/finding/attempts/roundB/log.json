@@ -1,0 +1,73 @@
+{
+ "case": "BenchmarkTest00167",
+ "semgrep": "1.180.0",
+ "rules": "weaver.yaml",
+ "model_flag": "sonnet",
+ "original_findings": [
+  {
+   "rule": "python.flask.security.injection.subprocess-injection",
+   "line": 53
+  },
+  {
+   "rule": "python.lang.security.audit.subprocess-shell-true",
+   "line": 53
+  },
+  {
+   "rule": "python.lang.security.dangerous-subprocess-use",
+   "line": 53
+  }
+ ],
+ "attempts": [
+  {
+   "attempt": 1,
+   "feedback_given": "",
+   "backend": "claude cli",
+   "model": "claude-sonnet-5-5",
+   "seconds": 10.81,
+   "rescan": [
+    {
+     "rule": "python.flask.security.injection.subprocess-injection",
+     "line": 49
+    },
+    {
+     "rule": "python.lang.security.dangerous-subprocess-use",
+     "line": 49
+    }
+   ],
+   "verdict": "rolled back"
+  },
+  {
+   "attempt": 2,
+   "feedback_given": "A previous attempt was rolled back: Semgrep still reported python.flask.security.injection.subprocess-injection at line 49. Try a different, still minimal fix.",
+   "backend": "claude cli",
+   "model": "claude-sonnet-5-5",
+   "seconds": 12.71,
+   "rescan": [
+    {
+     "rule": "python.flask.security.injection.subprocess-injection",
+     "line": 48
+    }
+   ],
+   "verdict": "rolled back"
+  },
+  {
+   "attempt": 3,
+   "feedback_given": "A previous attempt was rolled back: Semgrep still reported python.flask.security.injection.subprocess-injection at line 48. Try a different, still minimal fix.",
+   "backend": "claude cli",
+   "model": "claude-sonnet-5-5",
+   "seconds": 10.94,
+   "rescan": [
+    {
+     "rule": "python.flask.security.injection.subprocess-injection",
+     "line": 53
+    },
+    {
+     "rule": "python.lang.security.dangerous-subprocess-use",
+     "line": 53
+    }
+   ],
+   "verdict": "rolled back"
+  }
+ ],
+ "finished": "2026-10-09 14:51:14 PDT"
+}

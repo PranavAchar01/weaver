@@ -1,0 +1,20 @@
+--- a/testcode/BenchmarkTest00167.py
++++ b/testcode/BenchmarkTest00167.py
+@@ -47,10 +47,10 @@
+ 			argStr = "cmd.exe /c "
+ 		else:
+ 			argStr = "sh -c "
+-		argStr += f"echo {bar}"
++		argStr += "echo"
+ 
+ 		try:
+-			proc = subprocess.run(argStr, shell=True, capture_output=True, encoding="utf-8")
++			proc = subprocess.CompletedProcess(argStr, 0, stdout=bar + "\n", stderr="")
+ 
+ 			RESPONSE += (
+ 				helpers.utils.commandOutput(proc)
+@@ -61,4 +61,3 @@
+ 			)
+ 
+ 		return RESPONSE
+-

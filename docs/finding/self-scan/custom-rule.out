@@ -1,0 +1,24 @@
+                   
+                   
+┌─────────────────┐
+│ 2 Code Findings │
+└─────────────────┘
+                      
+    bench/run_bench.py
+   ❯❯❱ docs.finding.weaver-incomplete-nosem-guard
+          ❰❰ Blocking ❱❱
+          This guard rejects text containing "nosemgrep" but Semgrep also honours the short form "nosem". A 
+          patch that adds "# nosem" passes this check and silences the scanner. Match the regex nosem(grep)?
+          or compare findings with --disable-nosem.                                                         
+                                                                                                            
+           59┆ if "nosemgrep" in new:
+                    
+    weaver/server.py
+   ❯❯❱ docs.finding.weaver-incomplete-nosem-guard
+          ❰❰ Blocking ❱❱
+          This guard rejects text containing "nosemgrep" but Semgrep also honours the short form "nosem". A 
+          patch that adds "# nosem" passes this check and silences the scanner. Match the regex nosem(grep)?
+          or compare findings with --disable-nosem.                                                         
+                                                                                                            
+          536┆ if "nosemgrep" in new:
+

@@ -1,0 +1,9 @@
+rules:
+- id: weaver-incomplete-nosem-guard
+  languages: [python]
+  severity: ERROR
+  message: >-
+    This guard rejects text containing "nosemgrep" but Semgrep also honours the short
+    form "nosem". A patch that adds "# nosem" passes this check and silences the scanner.
+    Match the regex nosem(grep)? or compare findings with --disable-nosem.
+  pattern: '"nosemgrep" in $X'

@@ -1,0 +1,6 @@
+original file:           3 Semgrep findings: ['dangerous-subprocess-use', 'subprocess-injection', 'subprocess-shell-true']
+guard "nosemgrep" in new -> False
+compiles                 -> True
+rescan after '# nosem':  0 Semgrep findings
+Weaver's checks call this: MENDED (accepted)
+lines changed: 1 (a comment). The shell=True call with user input is untouched.

@@ -1,0 +1,30 @@
+--- a/testcode/BenchmarkTest00167.py
++++ b/testcode/BenchmarkTest00167.py
+@@ -39,18 +39,17 @@
+ 			bar = param
+ 
+ 		import platform
++		import re
+ 		import subprocess
+ 		import helpers.utils
+ 
+-		argStr = ""
+ 		if platform.system() == "Windows":
+-			argStr = "cmd.exe /c "
++			argStr = ["cmd.exe", "/c", "echo", re.sub(r'[^\w\s.,:;@#%+=/\\-]', '', bar)]
+ 		else:
+-			argStr = "sh -c "
+-		argStr += f"echo {bar}"
++			argStr = ["echo", bar]
+ 
+ 		try:
+-			proc = subprocess.run(argStr, shell=True, capture_output=True, encoding="utf-8")
++			proc = subprocess.run(argStr, capture_output=True, encoding="utf-8")
+ 
+ 			RESPONSE += (
+ 				helpers.utils.commandOutput(proc)
+@@ -61,4 +60,3 @@
+ 			)
+ 
+ 		return RESPONSE
+-

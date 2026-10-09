@@ -1,0 +1,30 @@
+--- a/testcode/BenchmarkTest00167.py
++++ b/testcode/BenchmarkTest00167.py
+@@ -38,19 +38,14 @@
+ 		else:
+ 			bar = param
+ 
+-		import platform
++		import sys
+ 		import subprocess
+ 		import helpers.utils
+ 
+-		argStr = ""
+-		if platform.system() == "Windows":
+-			argStr = "cmd.exe /c "
+-		else:
+-			argStr = "sh -c "
+-		argStr += f"echo {bar}"
++		cmd = [sys.executable, "-c", "import sys;sys.stdout.write(sys.stdin.read())"]
+ 
+ 		try:
+-			proc = subprocess.run(argStr, shell=True, capture_output=True, encoding="utf-8")
++			proc = subprocess.run(cmd, input=bar + "\n", capture_output=True, encoding="utf-8")
+ 
+ 			RESPONSE += (
+ 				helpers.utils.commandOutput(proc)
+@@ -61,4 +56,3 @@
+ 			)
+ 
+ 		return RESPONSE
+-

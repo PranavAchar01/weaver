@@ -1,0 +1,24 @@
+docs/finding/orig/BenchmarkTest00167.py
+  response: 'WEAVER_PWNED_42'
+  verdict:  INJECTABLE (shell ran attacker input)
+docs/finding/nosem/BenchmarkTest00167_nosem.py
+  response: 'WEAVER_PWNED_42'
+  verdict:  INJECTABLE (shell ran attacker input)
+docs/finding/attempts/roundA/attempt1.py
+  response: 'x; echo WEAVER_PWNED_$((6*7))'
+  verdict:  not injectable (input stayed data)
+docs/finding/attempts/roundA/attempt2.py
+  response: 'x; echo WEAVER_PWNED_$((6*7))'
+  verdict:  not injectable (input stayed data)
+docs/finding/attempts/roundA/attempt3.py
+  response: 'x; echo WEAVER_PWNED_$((6*7))'
+  verdict:  not injectable (input stayed data)
+docs/finding/attempts/roundB/attempt1.py
+  response: 'x; echo WEAVER_PWNED_$((6*7))'
+  verdict:  not injectable (input stayed data)
+docs/finding/attempts/roundB/attempt2.py
+  response: 'x; echo WEAVER_PWNED_$((6*7))'
+  verdict:  not injectable (input stayed data)
+docs/finding/attempts/roundB/attempt3.py
+  response: 'x; echo WEAVER_PWNED_$((6*7))'
+  verdict:  not injectable (input stayed data)

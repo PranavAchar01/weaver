@@ -1,0 +1,55 @@
+[
+ {
+  "check_id": "Users.pranavachar.helloworld.weaver-finding.rules.python.flask.security.injection.subprocess-injection.subprocess-injection",
+  "path": "/Users/pranavachar/helloworld/weaver-finding/work/testcode/BenchmarkTest00167.py",
+  "start": {
+   "line": 48,
+   "col": 11,
+   "offset": 1421
+  },
+  "end": {
+   "line": 48,
+   "col": 87,
+   "offset": 1497
+  },
+  "extra": {
+   "message": "Detected user input entering a `subprocess` call unsafely. This could result in a command injection vulnerability. An attacker could use this vulnerability to execute arbitrary commands on the host, which allows them to download malware, scan sensitive data, or run any command they wish on the server. Do not let users choose the command to run. In general, prefer to use Python API versions of system commands. If you must use subprocess, use a dictionary to allowlist a set of commands.",
+   "metadata": {
+    "category": "security",
+    "technology": [
+     "flask"
+    ],
+    "owasp": [
+     "A01:2017 - Injection",
+     "A03:2021 - Injection",
+     "A05:2025 - Injection"
+    ],
+    "cwe": [
+     "CWE-78: Improper Neutralization of Special Elements used in an OS Command ('OS Command Injection')"
+    ],
+    "references": [
+     "https://semgrep.dev/docs/cheat-sheets/python-command-injection/"
+    ],
+    "confidence": "HIGH",
+    "cwe2022-top25": true,
+    "cwe2021-top25": true,
+    "subcategory": [
+     "vuln"
+    ],
+    "likelihood": "HIGH",
+    "impact": "MEDIUM",
+    "license": "Semgrep Rules License v1.0. For more details, visit semgrep.dev/legal/rules-license",
+    "vulnerability_class": [
+     "Command Injection"
+    ],
+    "source": "https://semgrep.dev/r/python.flask.security.injection.subprocess-injection.subprocess-injection",
+    "shortlink": "https://sg.run/5gW3"
+   },
+   "severity": "ERROR",
+   "fingerprint": "requires login",
+   "lines": "requires login",
+   "validation_state": "NO_VALIDATOR",
+   "engine_kind": "OSS"
+  }
+ }
+]

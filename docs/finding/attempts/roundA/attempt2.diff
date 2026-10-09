@@ -1,0 +1,26 @@
+--- a/testcode/BenchmarkTest00167.py
++++ b/testcode/BenchmarkTest00167.py
+@@ -42,15 +42,13 @@
+ 		import subprocess
+ 		import helpers.utils
+ 
+-		argStr = ""
+ 		if platform.system() == "Windows":
+-			argStr = "cmd.exe /c "
++			args = ["cmd.exe", "/c", "findstr", "^"]
+ 		else:
+-			argStr = "sh -c "
+-		argStr += f"echo {bar}"
++			args = ["cat"]
+ 
+ 		try:
+-			proc = subprocess.run(argStr, shell=True, capture_output=True, encoding="utf-8")
++			proc = subprocess.run(args, input=bar + "\n", capture_output=True, encoding="utf-8")
+ 
+ 			RESPONSE += (
+ 				helpers.utils.commandOutput(proc)
+@@ -61,4 +59,3 @@
+ 			)
+ 
+ 		return RESPONSE
+-

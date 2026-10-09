@@ -1,0 +1,28 @@
+--- a/testcode/BenchmarkTest00167.py
++++ b/testcode/BenchmarkTest00167.py
+@@ -40,17 +40,13 @@
+ 
+ 		import platform
+ 		import subprocess
++		import sys
+ 		import helpers.utils
+ 
+-		argStr = ""
+-		if platform.system() == "Windows":
+-			argStr = "cmd.exe /c "
+-		else:
+-			argStr = "sh -c "
+-		argStr += f"echo {bar}"
++		argList = [sys.executable, "-c", "import sys; print(sys.argv[1])", bar]
+ 
+ 		try:
+-			proc = subprocess.run(argStr, shell=True, capture_output=True, encoding="utf-8")
++			proc = subprocess.run(argList, capture_output=True, encoding="utf-8")
+ 
+ 			RESPONSE += (
+ 				helpers.utils.commandOutput(proc)
+@@ -61,4 +57,3 @@
+ 			)
+ 
+ 		return RESPONSE
+-
