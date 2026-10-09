@@ -44,11 +44,12 @@ All numbers are measured from one continuous recorded shell session (demo/real.c
 - https://github.com/PranavAchar01/isso/pull/1 (inside the fork: base PranavAchar01/isso master, head weaver/mend). Title "Mend 3 Semgrep findings in isso/migrate.py".
 - Nothing opened on upstream isso-comments/isso (no PR, issue or comment).
 
-## Planned shot list, demo/weaver-demo-60s.mp4 (about 54 s, silent, 1080p; may shift by a second)
-- 0.0 to 6.5   Terminal: `cd isso`, `weaver watch . --lang python --no-tests`; Weaver prints rules, "watching isso (296 files), verify: rescan + compile only (tests not run)", "skipping 5 paths", the URL. Real session, replay speed on screen.
-- 6.5 to 24.8  Browser, 127.0.0.1:8765: the web of isso's real file paths; strand isso/migrate.py tears (3 findings); Semgrep autofix tried and rolled back; LLM patch; pluck to verify (rescan clean, compiles); mended; rule remembered. Replay 3x, stated on screen.
-- 24.8 to 33.5 Terminal again (same session): Ctrl-C, `git log --oneline -3`, `git switch -c weaver/mend`, `git push -q fork weaver/mend`, `gh pr create ...`, PR URL printed. Replay about 3x, stated.
-- 33.5 to 39.5 Browser: the PR page github.com/PranavAchar01/isso/pull/1, with a times strip: scan 3.9 s, mend 36.1 s, `weaver watch` to PR opened 81 s; 25 findings, 3 real mended, 22 skipped by hand as false positives; tests not run.
-- 39.5 to 41.8 Browser tab: OWASP BenchmarkPython on GitHub.
-- 41.8 to 48.2 Benchmark terminal session (`weaver bench --summary`), unchanged.
-- 48.2 to 54   Score card (16 / 17 on the 42-case sample, 1 held, reproduce line), unchanged.
+## Shot list, demo/weaver-demo-60s.mp4 (58.5 s, silent, 1080p, round 6; round 5 is weaver-demo-60s-v5.mp4)
+- 0.0 to 5.5   Terminal: `cd isso`, `weaver watch . --lang python --no-tests`. Real session, replayed at 1.5x, stated on screen.
+- 5.5 to 20.3  Browser, 127.0.0.1:8765: the isso run (demo/real-run.jsonl) replayed at 3.6x, stated on screen. Left column: plain-text log of the recorded events and running totals.
+- 20.3 to 27.5 Terminal again (same session): Ctrl-C, git log, branch, push to the fork, `gh pr create`. Replayed at 4x, stated.
+- 27.5 to 32.0 Browser: one still of github.com/PranavAchar01/isso/pull/1 with the times strip.
+- 32.0 to 33.5 Browser: one still of OWASP-Benchmark/BenchmarkPython on GitHub.
+- 33.5 to 52.5 Browser: the web app replaying demo/bench-run.jsonl, a live `weaver watch . --no-tests` re-run on the 42-case benchmark sample recorded today (693 s, one file at a time), replayed at 44x, stated on screen. 29 files flagged, 28 mended, 1 held (cmdi/BenchmarkTest00167). Same per-case outcome as bench/results.json.
+- 52.5 to 58.5 Score card from bench/results.json (16 / 17, 1 held), with a line saying the card is the earlier full run and that the live re-run gave the same result on these 17.
+- The benchmark terminal session (`weaver bench --summary`) is no longer in the film.

@@ -90,3 +90,13 @@ canvas#web { position: fixed; inset: 0; width: 100vw; height: 100vh; display: bl
 #commit code { font-family: "CMU Typewriter Text", monospace; font-size: calc(20 * var(--u)); white-space: nowrap; }
 #status { font-size: calc(17 * var(--u)); font-style: italic; opacity: 0.66; margin-top: calc(10 * var(--u)); min-height: calc(22 * var(--u)); white-space: nowrap; }
 #corner { font-size: calc(14 * var(--u)); opacity: 0.45; margin-top: calc(6 * var(--u)); min-height: calc(18 * var(--u)); }
+
+#log { display: none; position: fixed; left: calc(60 * var(--u)); top: calc(372 * var(--u)); width: calc(400 * var(--u)); background: rgba(0, 0, 0, 0.86); font-family: "CMU Typewriter Text", monospace; font-size: calc(17.5 * var(--u)); line-height: 1.36; white-space: pre; overflow: hidden; }
+#log-totals { border-top: 1px solid rgba(255, 255, 255, 0.5); border-bottom: 1px solid rgba(255, 255, 255, 0.5); padding: calc(6 * var(--u)) 0; margin-bottom: calc(8 * var(--u)); font-size: calc(18.5 * var(--u)); }
+#log-lines div { opacity: 0.74; }
+#log-lines div b { font-weight: normal; opacity: 0.75; }
+#log-lines div.hot { opacity: 1; }
+#log-lines div:last-child { opacity: 1; }
+#head .runnote { font-size: calc(19 * var(--u)); font-style: italic; line-height: 1.3; margin-top: calc(16 * var(--u)); width: calc(400 * var(--u)); opacity: 0.95; }
+#corner { font-size: calc(17 * var(--u)); opacity: 0.75; }
+#score .cardnote { position: absolute; left: 0; right: 0; bottom: calc(134 * var(--u)); font-size: calc(22 * var(--u)); font-style: italic; opacity: 0.8; }

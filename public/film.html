@@ -76,7 +76,7 @@ body { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; 
     <div id="omni"><svg viewBox="0 0 20 20" id="omni-ico"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 6.2v.2"/></svg><span id="url">127.0.0.1:8765</span></div>
     <svg viewBox="0 0 20 20"><circle cx="10" cy="4.5" r=".6"/><circle cx="10" cy="10" r=".6"/><circle cx="10" cy="15.5" r=".6"/></svg>
   </div>
-  <div id="view"><iframe id="app"></iframe><div id="gh"><img id="ghimg" src="broll/github.png" alt=""></div><div id="pr"><img id="primg" src="broll/pr.png" alt=""><div id="times"><b id="times1"></b><i id="times2"></i></div></div></div>
+  <div id="view"><iframe id="app"></iframe><iframe id="app2" style="display: none"></iframe><div id="gh"><img id="ghimg" src="broll/github.png" alt=""></div><div id="pr"><img id="primg" src="broll/pr.png" alt=""><div id="times"><b id="times1"></b><i id="times2"></i></div></div></div>
 </div>
 
 <p class="say big" id="say2" style="z-index: 4">Where the benchmark is, and what ran.</p>
@@ -88,13 +88,13 @@ body { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; 
 (async () => {
 const Q = new URLSearchParams(location.search);
 const P = (k, d) => parseFloat(Q.get(k) || d);
-const TB = P('tb', 6.5);
-const TP = P('tp', 24.8);       // the same terminal comes back: stop, push, open the pull request
-const TQ = P('tq', 33.5);       // the pull request page        // browser window comes forward
-const TG = P('tg', 39.5);       // benchmark page on GitHub
-const TT = P('tt', 41.8);       // benchmark terminal session
-const TS = P('ts', 48.2);       // score card
-const SPEED = Q.get('speed') || '3', LEAD = P('lead', 6.9);
+const TB = P('tb', 5.5);
+const TP = P('tp', 20.3);       // the same terminal comes back: stop, push, open the pull request
+const TQ = P('tq', 27.5);       // the pull request page        // browser window comes forward
+const TG = P('tg', 32);       // benchmark page on GitHub
+const TT = P('tt', 52.5);       // benchmark terminal session
+const TS = P('ts', 52.5);       // score card
+const SPEED = Q.get('speed') || '3.6', LEAD = P('lead', 5.9);
 const $ = (id) => document.getElementById(id);
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const ease = (q) => q * q * (3 - 2 * q);
@@ -150,14 +150,26 @@ const place = (win, say, note, mid) => {
 };
 place('t1', 'say1', 'note1', 560); place('t2', 'say2', 'note2', 556);
 
-const app = $('app');
-app.src = `/?replay=real-run.jsonl&speed=${SPEED}&lead=${LEAD}&outro=${TS - 0.25}&broll=0&capture`;
-await new Promise((r) => { const iv = setInterval(() => { try { if (app.contentWindow.__ready === true) { clearInterval(iv); r(); } } catch (e) {} }, 30); });
+const TA2 = P('ta2', 33.5);     // the web app again, on the benchmark sample
+const PACE2 = Q.get('pace2') || '3';
+const app = $('app'), app2 = $('app2');
+// the benchmark replay speed is whatever fits the whole recorded run into its shot, rounded up to a whole number
+const bev = (await (await fetch('/replay/bench-run.jsonl')).text()).trim().split('\n').map((l) => JSON.parse(l));
+const bspan = bev[bev.length - 1].t - bev.find((e) => e.type === 'scan_start').t;
+const bn = (k) => bev.filter((e) => e.type === k).length;
+const SPEED2 = Q.get('speed2') || String(Math.ceil(bspan / (TS - 2.6 - (TA2 + 0.5))));
+const N1 = encodeURIComponent('isso at commit 413d447, 296 files. One real run.');
+const N2 = encodeURIComponent(`OWASP Benchmark for Python, 42-case sample. Live re-run recorded today, one file at a time. Semgrep flags ${bn('tear')} files; 17 are the benchmark's own vulnerability and only those are scored.`);
+const CN = encodeURIComponent('Card numbers are from the earlier full run today (bench/results.json). The live re-run just shown gave the same result on these 17.');
+app.src = `/?replay=real-run.jsonl&speed=${SPEED}&lead=${LEAD}&broll=0&note=${N1}&capture`;
+app2.src = `/?replay=bench-run.jsonl&speed=${SPEED2}&pace=${PACE2}&lead=${TA2 + 0.5}&outro=${TS - 0.25}&broll=0&median=0&note=${N2}&cardnote=${CN}&capture`;
+await new Promise((r) => { const iv = setInterval(() => { try { if (app.contentWindow.__ready === true && app2.contentWindow.__ready === true) { clearInterval(iv); r(); } } catch (e) {} }, 30); });
 
 const pop = (el, q, max = 1) => { el.style.opacity = max * q; el.style.transform = `scale(${0.965 + 0.035 * ease(q)})`; };
 window.__frame = async (ms) => {
   const t = ms / 1000;
-  app.contentWindow.__frame(ms);                               // the app runs on the same clock from 0
+  app.contentWindow.__frame(ms); app2.contentWindow.__frame(ms);
+  app2.style.display = t >= TA2 ? 'block' : 'none';                               // the app runs on the same clock from 0
 
   const ph2 = t >= TP && t < TQ;
   const inBrowser = t >= TB && !(t >= TT && t < TS) && !ph2;
@@ -174,18 +186,16 @@ window.__frame = async (ms) => {
   // browser
   const behind = Math.max(clamp((t - TT) / 0.25, 0, 1) * clamp((TS - t) / 0.25, 0, 1), clamp((t - TP) / 0.25, 0, 1) * clamp((TQ - t) / 0.25, 0, 1));
   pop($('browser'), clamp((t - TB) / 0.28, 0, 1), 1 - 0.95 * behind);
-  const gh = t >= TG && t < TS - 0.1;
+  const gh = t >= TG && t < TA2;
   $('gh').style.display = gh ? 'block' : 'none';
   $('tabB').style.display = t >= TG ? 'flex' : 'none';
   const pr = t >= TQ && t < TG;
   $('pr').style.display = pr ? 'block' : 'none';
   $('tabC').style.display = t >= TQ ? 'flex' : 'none';
   $('tabC').className = pr ? 'tab on' : 'tab';
-  if (pr) $('primg').style.transform = `translateY(${-ease(clamp((t - TQ - 1.2) / (TG - TQ - 2.2), 0, 1)) * 250}px)`;
   $('tabA').className = gh || pr ? 'tab' : 'tab on'; $('tabB').className = gh ? 'tab on' : 'tab';
   $('url').textContent = gh ? 'github.com/OWASP-Benchmark/BenchmarkPython' : pr ? 'github.com/PranavAchar01/isso/pull/1' : '127.0.0.1:8765';
   $('omni-ico').innerHTML = gh || pr ? '<rect x="5" y="9" width="10" height="7" rx="1.5"/><path d="M7.3 9V6.8a2.7 2.7 0 0 1 5.4 0V9"/>' : '<circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 6.2v.2"/>';
-  if (gh) $('ghimg').style.transform = `translateY(${-ease(clamp((t - TG - 0.5) / (TT - TG - 0.5), 0, 1)) * 330}px)`;
   // benchmark terminal
   const q2 = clamp((t - TT) / 0.22, 0, 1) * clamp((TS - t) / 0.2, 0, 1);
   pop($('t2'), q2);
@@ -198,7 +208,7 @@ window.__frame = async (ms) => {
 };
 await feed(A, -1); await feed(B, -1);
 await window.__frame(0); await raf(); await raf();
-window.__speeds = { intro: sA, pr: sP, bench: sB };
+window.__speeds = { intro: sA, pr: sP, isso: SPEED, bench: SPEED2, benchSpan: bspan, tears: bn('tear'), mended: bn('mended'), held: bn('held') };
 window.__ready = true;
 })();
 </script>

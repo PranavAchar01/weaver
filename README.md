@@ -8,7 +8,7 @@ Built on [Semgrep](https://github.com/semgrep/semgrep).
 
 ![A tear, the spider mending it, the pluck that verifies it](docs/img/weaver.gif)
 
-Full demo, 54 seconds: [demo/weaver-demo-60s.mp4](demo/weaver-demo-60s.mp4) (silent, 1080p). The earlier 45 second cut is [demo/weaver-demo-45s.mp4](demo/weaver-demo-45s.mp4).
+Full demo, 58.5 seconds: [demo/weaver-demo-60s.mp4](demo/weaver-demo-60s.mp4) (silent, 1080p). The previous 54 second cut is [demo/weaver-demo-60s-v5.mp4](demo/weaver-demo-60s-v5.mp4). The earlier 45 second cut is [demo/weaver-demo-45s.mp4](demo/weaver-demo-45s.mp4).
 
 ## A real run on a real project
 

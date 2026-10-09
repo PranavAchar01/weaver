@@ -6,6 +6,7 @@
 const Q = new URLSearchParams(location.search);
 const REPLAY = Q.get('replay');
 const SPEED = parseFloat(Q.get('speed') || '1');
+const PACE = parseFloat(Q.get('pace') || '1');           // spider animation rate, for long replayed runs
 const LEAD = parseFloat(Q.get('lead') || (REPLAY ? '5' : '0'));      // seconds of title before replay starts
 const OUTRO = Q.get('outro') ? parseFloat(Q.get('outro')) : null;   // screen time of the closing line
 const CAPTURE = Q.has('capture');                                    // frames are stepped from outside
@@ -68,8 +69,8 @@ function buildWeb(tree) {
   const N = Math.max(dirs.length, 7);
   const maxFiles = Math.max(...dirs.map((d) => d.files.length), 1);
   const K = Math.max(9, maxFiles + 3);
-  const cx = W * 0.335, cy = H * 0.512;
-  const R = Math.min(H * 0.378, W * 0.22);
+  const cx = W * 0.372, cy = H * 0.512;
+  const R = Math.min(H * 0.352, W * 0.205);
   const step = TAU / N;
   const radials = [];
   for (let i = 0; i < N; i++) {
@@ -267,6 +268,7 @@ function startAction(a) {
     a.dur = 0.3;
     tearStrand(a.strand, 0);
   } else a.dur = 0;
+  a.dur /= PACE;
   if (a.onStart) a.onStart();
 }
 function nearEnd(strand) {
@@ -503,7 +505,43 @@ function ledgerEntry(t, ev) {
 const status = (s) => { $('status').textContent = s; };
 let commitShownAt = -99;
 
+/* plain-text log in the left column: one or two lines per real event, plus running totals */
+const LOG = { found: 0, mended: 0, held: 0, lines: [] };
+function logLine(k, text) {
+  const box = $('log'); if (!box) return;
+  const d = document.createElement('div');
+  d.innerHTML = `<b>${esc(k.padEnd(9))}</b>${esc(text)}`;
+  if (k === 'MENDED' || k === 'HELD') d.className = 'hot';
+  $('log-lines').appendChild(d);
+  while ($('log-lines').children.length > 19) $('log-lines').removeChild($('log-lines').firstChild);
+  $('log-totals').textContent = `found ${LOG.found}  mended ${LOG.mended}  held ${LOG.held}  open ${LOG.found - LOG.mended - LOG.held}`;
+  box.style.display = 'block';
+}
+const short = (p) => (p.length > 27 ? '…' + p.slice(-26) : p);
+function logEv(ev) {
+  const t = tears.get(ev.id), path = ev.path || (t && t.ev.path) || '';
+  switch (ev.type) {
+    case 'init': logLine('watch', `./${ev.repo}`); logLine('semgrep', `${ev.semgrep}, ${ev.rule_count} rules`); break;
+    case 'scan_start': logLine('scanning', ev.reason === 'startup' ? 'the whole repo' : `after ${ev.reason}`); break;
+    case 'scan_done': logLine('scan', `${ev.findings} finding${ev.findings === 1 ? '' : 's'}, ${ev.files} file${ev.files === 1 ? '' : 's'}, ${ev.seconds.toFixed(1)} s`); break;
+    case 'tear': LOG.found++; logLine('finding', short(ev.rule.split('.').pop())); logLine('', `${short(ev.path)}:${ev.lines.join(',')}`); break;
+    case 'mend_start': logLine('mending', short(path)); break;
+    case 'autofix_none': logLine('autofix', 'none offered by Semgrep'); break;
+    case 'patch': logLine(ev.backend === 'semgrep autofix' ? 'autofix' : 'patch', `${ev.backend === 'semgrep autofix' ? 'tried' : 'written by LLM'}, +${ev.added} -${ev.removed}, ${ev.seconds.toFixed(1)} s`); break;
+    case 'patch_failed': logLine('patch', 'rejected'); break;
+    case 'verify': logLine(ev.detail === 'compiles' ? 'compile' : ev.step, `${ev.ok ? 'ok' : 'FAIL'}: ${short(ev.detail)}`); break;
+    case 'rollback': logLine('rollback', short(ev.reason)); break;
+    case 'mended': LOG.mended++; logLine('MENDED', Q.get('median') === '0' ? short(path) : `${short(path).slice(-22)} ${ev.seconds.toFixed(1)} s`); break;
+    case 'held': LOG.held++; logLine('HELD', `${short(path).slice(-22)} for a human`); break;
+    case 'rule_written': logLine('rule', 'written to .weaver/rules'); break;
+  }
+}
+
+if (Q.get('median') === '0') $('n-median').parentNode.style.display = 'none';   // serial runs: seconds include queue wait
+if (Q.get('note')) { const n = document.createElement('p'); n.className = 'runnote'; n.textContent = Q.get('note'); $('head').appendChild(n); }
+
 function handle(ev, instant) {
+  if (!instant) logEv(ev);
   switch (ev.type) {
     case 'init':
       status(`watching ./${ev.repo} with ${ev.semgrep ? 'Semgrep ' + ev.semgrep : 'Semgrep'}`);
@@ -521,7 +559,7 @@ function handle(ev, instant) {
       break;
     case 'tear': {
       const strand = strands.get(ev.path); if (!strand) break;
-      const delay = instant ? 0 : (handle.stagger || 0) * 0.3; handle.stagger = (handle.stagger || 0) + 1;
+      const delay = instant ? 0 : (handle.stagger || 0) * 0.3 / PACE; handle.stagger = (handle.stagger || 0) + 1;
       tears.set(ev.id, { ev, strand, li: null, steps: [] });
       tearStrand(strand, delay); strand.held = false;
       const fire = () => { nOpen++; setNums(); const s = strand.seg, A = web.nodes[s.i][s.k], B = web.nodes[s.j][s.k]; ripple((A.x + B.x) / 2, (A.y + B.y) / 2, 2.6, 0.25); };
@@ -671,7 +709,8 @@ async function boot() {
         (b.held_in_benchmark_category ? `<p class="heldline">The ${b.held_in_benchmark_category} it could not verify ${b.held_in_benchmark_category === 1 ? 'was' : 'were'} rolled back and held for a human.</p>` : '') +
         versus +
         `<p class="limit">${b.sampled}-case sample. ${b.flagged_other_issue_only + b.not_flagged} that Semgrep missed stay open. Mended = rescan clean and compiles.</p>` +
-        `<p class="repro">Reproduce: ./bench/run.sh &middot; OWASP-Benchmark/BenchmarkPython @ ${res.summary.benchmark_commit.slice(0, 7)}</p>`;
+        `<p class="repro">Reproduce: ./bench/run.sh &middot; OWASP-Benchmark/BenchmarkPython @ ${res.summary.benchmark_commit.slice(0, 7)}</p>` +
+        (Q.get('cardnote') ? `<p class="cardnote">${esc(Q.get('cardnote'))}</p>` : '');
     } catch (e) { benchOK = null; }
   } else {
     const opened = Date.now() / 1000;
