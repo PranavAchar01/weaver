@@ -11,13 +11,21 @@ This is a sample, not the full benchmark score.
 - Patcher: Claude Code CLI, headless, model sonnet, tools disabled
 - Date: 2026-10-09
 
-Commands, from the repo root:
+One command does all of it (`./bench/run.sh --dry-run` only checks the setup and shows the sample):
+
+```
+./bench/run.sh
+```
+
+The patches come from a language model, so a new run can differ by a case from the saved one.
+`weaver bench --summary` prints the saved numbers as a per-category table. The steps inside the script:
 
 ```
 git clone https://github.com/OWASP-Benchmark/BenchmarkPython bench/BenchmarkPython
 git -C bench/BenchmarkPython checkout f1291485808b66e20ddb6b01b10dc71b3df8c8ba
 .venv/bin/python bench/run_bench.py
 .venv/bin/python bench/classify.py
+.venv/bin/python bench/baseline.py
 ```
 
 The benchmark code is treated as untrusted. Nothing in it was installed or
@@ -33,6 +41,10 @@ Case ids: 00001 00002 00003 00018 00019 00025 00026 00027 00054 00057 00058
 00064 00065 00066 00067 00068 00072 00074 00078 00096 00097 00098 00099 00101
 00153 00159 00160 00164 00165 00166 00167 00205 00258 00260 00265 00266 00269
 00283 00284 00294 00427 00460 (each is `BenchmarkTestNNNNN`).
+
+The 17 where Semgrep found the benchmark's own vulnerability: 00054 00057
+00058 00064 00065 00066 00074 00078 00159 00160 00164 00166 00167 00205 00269
+00294 00460. Held: 00167. Fixed by Semgrep autofix alone: 00166.
 
 ## What "mended" means here
 
@@ -115,4 +127,4 @@ Read this plainly:
 - `results-run1-invalid.json`: an earlier run where every case was marked
   held. That was a bug in our harness (the compile check wrote to a bad
   path and raised), not a real result. It is kept so the record is complete.
-- `run_bench.py`, `classify.py`: the harness.
+- `run.sh`, `run_bench.py`, `classify.py`: the harness.

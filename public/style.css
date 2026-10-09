@@ -81,7 +81,8 @@ canvas#web { position: fixed; inset: 0; width: 100vw; height: 100vh; display: bl
 #score .versus { display: inline-grid; grid-template-columns: auto auto auto; column-gap: calc(40 * var(--u)); row-gap: calc(6 * var(--u)); margin-top: calc(50 * var(--u)); font-size: calc(36 * var(--u)); text-align: left; font-variant-numeric: lining-nums; padding-top: calc(30 * var(--u)); border-top: 1px solid rgba(255, 255, 255, 0.4); }
 #score .versus .dim { opacity: 0.62; }
 #score .versus .r { text-align: right; }
-#score .limit { position: absolute; left: 0; right: 0; bottom: calc(64 * var(--u)); font-size: calc(27 * var(--u)); opacity: 0.88; }
+#score .repro { position: absolute; left: 0; right: 0; bottom: calc(40 * var(--u)); font-family: "CMU Typewriter Text", monospace; font-size: calc(23 * var(--u)); opacity: 0.8; }
+#score .limit { position: absolute; left: 0; right: 0; bottom: calc(86 * var(--u)); font-size: calc(27 * var(--u)); opacity: 0.88; }
 #score .tag { position: absolute; left: 0; right: 0; top: calc(64 * var(--u)); font-size: calc(27 * var(--u)); font-style: italic; opacity: 0.7; }
 
 #foot { position: fixed; left: calc(60 * var(--u)); bottom: calc(30 * var(--u)); width: calc(470 * var(--u)); }

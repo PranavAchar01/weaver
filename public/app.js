@@ -608,7 +608,7 @@ function intro() {                        // the command a user types, then the 
   termLines.forEach((l, i) => { if (now >= tOut + i * 0.38) html += `\n<span class="out">${esc(l)}</span>`; });
   $('term').innerHTML = html;
 }
-const BROLL = 3.7;                       // seconds the benchmark page stays up before the score
+const BROLL = Q.has('broll') ? parseFloat(Q.get('broll')) : 3.7;   // seconds the benchmark page stays up before the score (0: straight to the score)
 let benchOK = null;
 let replayEvents = null, replayT0 = 0, replayIdx = 0, outroDone = false;
 
@@ -619,10 +619,11 @@ function pump() {
     while (replayIdx < replayEvents.length && LEAD + (replayEvents[replayIdx].t - replayT0) / SPEED <= now) handle(replayEvents[replayIdx++], false);
     if (!outroDone && OUTRO != null && now >= OUTRO) {
       outroDone = true;
-      if (benchOK !== null) { fade($('film'), 0, 1, 0.45); later.push({ at: now + BROLL, fn: () => { fade($('broll'), 1, 0, 0.3); fade($('score'), 0, 1, 0.45, 0.3); } }); }
+      if (benchOK !== null && BROLL === 0) { $('broll').style.display = 'none'; $('score').style.opacity = 1; fade($('film'), 0, 1, 0.35); }
+      else if (benchOK !== null) { fade($('film'), 0, 1, 0.45); later.push({ at: now + BROLL, fn: () => { fade($('broll'), 1, 0, 0.3); fade($('score'), 0, 1, 0.45, 0.3); } }); }
     }
   }
-  if (outroDone) { const q = clamp((now - OUTRO) / (BROLL + 0.3), 0, 1); $('broll-img').style.transform = `translateY(${-(q * q * (3 - 2 * q)) * 46.5}%) scale(${1 + 0.03 * q})`; }
+  if (outroDone && BROLL > 0) { const q = clamp((now - OUTRO) / (BROLL + 0.3), 0, 1); $('broll-img').style.transform = `translateY(${-(q * q * (3 - 2 * q)) * 46.5}%) scale(${1 + 0.03 * q})`; }
   if (commitShownAt > 0 && !outroDone && now - commitShownAt > 9) { fade($('commit'), 1, 0, 0.8); commitShownAt = -99; }
 }
 
@@ -653,7 +654,7 @@ async function boot() {
     $('corner').textContent = `recorded run, replayed at ${SPEED}x`;
     if (INTRO) try { termLines = (await (await fetch('/replay/terminal.txt')).text()).trim().split('\n').slice(0, 3); } catch (e) { termLines = []; }
     try {                                   // independent check: numbers come straight from bench/results.json
-      const b = (await (await fetch('/bench/results.json')).json()).summary;
+      const res = await (await fetch('/bench/results.json')).json(), b = res.summary;
       const pct = (a, n) => Math.round((100 * a) / n);
       let versus = '';
       try {                                 // measured baseline: Semgrep autofix alone on the same cases
@@ -669,7 +670,8 @@ async function boot() {
         `<p class="what">${benchOK ? 'Every vulnerability' : 'Vulnerabilities'} Semgrep found in our OWASP Benchmark sample, mended.</p>` +
         (b.held_in_benchmark_category ? `<p class="heldline">The ${b.held_in_benchmark_category} it could not verify ${b.held_in_benchmark_category === 1 ? 'was' : 'were'} rolled back and held for a human.</p>` : '') +
         versus +
-        `<p class="limit">${b.sampled}-case sample. ${b.flagged_other_issue_only + b.not_flagged} that Semgrep missed stay open. Mended = rescan clean and compiles.</p>`;
+        `<p class="limit">${b.sampled}-case sample. ${b.flagged_other_issue_only + b.not_flagged} that Semgrep missed stay open. Mended = rescan clean and compiles.</p>` +
+        `<p class="repro">Reproduce: ./bench/run.sh &middot; OWASP-Benchmark/BenchmarkPython @ ${res.summary.benchmark_commit.slice(0, 7)}</p>`;
     } catch (e) { benchOK = null; }
   } else {
     const opened = Date.now() / 1000;

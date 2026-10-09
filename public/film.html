@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Weaver film</title>
+<link rel="stylesheet" href="vendor/xterm.css">
+<style>
+/* The demo film: a desktop with a terminal and a browser window around the real UI.
+   The terminals replay real recorded pty sessions (demo/*.cast.json) through xterm.js.
+   The browser window holds the real app in an iframe, replaying the real recorded run. */
+@font-face { font-family: "CMU Serif"; src: url("fonts/cmu-serif-500-roman.woff2") format("woff2"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "CMU Serif"; src: url("fonts/cmu-serif-500-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { width: 1920px; height: 1080px; background: #000; color: #fff; overflow: hidden; -webkit-font-smoothing: antialiased; }
+body { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; }
+
+#menubar { position: absolute; left: 0; right: 0; top: 0; height: 28px; background: #141414; color: #d6d6d6; font-size: 14px; display: flex; align-items: center; padding: 0 18px; gap: 22px; z-index: 9; }
+#menubar b { font-weight: 700; color: #ececec; }
+#menubar .apple { font-size: 17px; margin-right: 2px; }
+#menubar .right { margin-left: auto; display: flex; gap: 18px; color: #cfcfcf; }
+
+.win { position: absolute; border-radius: 11px; overflow: hidden; border: 1px solid #464646; box-shadow: 0 0 0 1px #000, 0 26px 70px rgba(0, 0, 0, 0.85), 0 0 90px rgba(255, 255, 255, 0.035); opacity: 0; transform-origin: 50% 50%; }
+.lights { display: flex; gap: 8px; }
+.lights i { width: 12px; height: 12px; border-radius: 50%; background: #5b5b5b; border: 0.5px solid #6c6c6c; display: block; }
+
+.term { background: #1d1d1d; left: 50%; }
+.term .bar { height: 30px; background: linear-gradient(#3a3a3a, #2f2f2f); border-bottom: 1px solid #111; display: flex; align-items: center; padding: 0 12px; position: relative; }
+.term .bar span { position: absolute; left: 0; right: 0; text-align: center; font-size: 13px; font-weight: 600; color: #c4c4c4; letter-spacing: 0.01em; }
+.term .body { padding: 6px 8px 8px 8px; filter: grayscale(1); }
+.xterm .xterm-viewport { overflow: hidden !important; }
+
+.say { position: absolute; left: 0; right: 0; text-align: center; font-family: "CMU Serif", serif; opacity: 0; }
+.say.big { font-size: 44px; }
+.say.note { font-size: 23px; font-style: italic; color: #c9c9c9; }
+
+#browser { left: 14px; top: 38px; width: 1892px; height: 1034px; background: #000; z-index: 2; }
+#tabs { height: 40px; background: #1b1b1b; display: flex; align-items: flex-end; padding-left: 16px; }
+#tabs .lights { align-self: center; margin-right: 22px; }
+.tab { height: 33px; width: 250px; border-radius: 9px 9px 0 0; padding: 0 12px; display: flex; align-items: center; gap: 9px; font-size: 13px; color: #a9a9a9; white-space: nowrap; overflow: hidden; }
+.tab.on { background: #333; color: #ededed; }
+.tab .fav { flex: none; width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid currentColor; opacity: 0.8; }
+.tab .t { overflow: hidden; text-overflow: ellipsis; flex: 1; }
+.tab .x { opacity: 0.55; font-size: 12px; }
+#tabs .plus { color: #9a9a9a; font-size: 19px; padding: 0 12px 6px; }
+#bar { height: 42px; background: #333; display: flex; align-items: center; padding: 0 14px; gap: 14px; border-bottom: 1px solid #1a1a1a; }
+#bar svg { width: 17px; height: 17px; stroke: #a8a8a8; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; flex: none; }
+#omni { flex: 1; height: 30px; border-radius: 15px; background: #1e1e1e; display: flex; align-items: center; padding: 0 14px; gap: 10px; font-size: 15.5px; color: #f0f0f0; letter-spacing: 0.01em; }
+#omni svg { width: 15px; height: 15px; }
+#view { position: relative; height: 951px; background: #000; overflow: hidden; }
+#view iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
+#gh { position: absolute; inset: 0; background: #fff; overflow: hidden; display: none; }
+#gh img { display: block; width: 100%; filter: grayscale(1); will-change: transform; }
+</style>
+</head>
+<body>
+<div id="menubar"><span class="apple">&#xF8FF;</span><b id="appname">Terminal</b><span id="menus"></span>
+  <span class="right"><span>Fri Oct 9</span><span>2:31 PM</span></span></div>
+
+<p class="say big" id="say1" style="top: 96px">What you do: one command in your repo. Then nothing.</p>
+<div class="win term" id="t1" style="z-index: 1"><div class="bar"><div class="lights"><i></i><i></i><i></i></div><span id="t1title"></span></div><div class="body" id="t1body"></div></div>
+<p class="say note" id="note1"></p>
+
+<div class="win" id="browser">
+  <div id="tabs"><div class="lights"><i></i><i></i><i></i></div>
+    <div class="tab on" id="tabA"><i class="fav"></i><span class="t">Weaver</span><span class="x">&#x2715;</span></div>
+    <div class="tab" id="tabB" style="display: none"><i class="fav"></i><span class="t">OWASP-Benchmark/BenchmarkPython: OWASP Benchmark for Python</span><span class="x">&#x2715;</span></div>
+    <span class="plus">+</span></div>
+  <div id="bar">
+    <svg viewBox="0 0 20 20"><path d="M12 4 6 10l6 6"/></svg>
+    <svg viewBox="0 0 20 20" style="opacity: .45"><path d="M8 4l6 6-6 6"/></svg>
+    <svg viewBox="0 0 20 20"><path d="M16 10a6 6 0 1 1-1.8-4.3M16 4v3.4h-3.4"/></svg>
+    <div id="omni"><svg viewBox="0 0 20 20" id="omni-ico"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 6.2v.2"/></svg><span id="url">127.0.0.1:8765</span></div>
+    <svg viewBox="0 0 20 20"><circle cx="10" cy="4.5" r=".6"/><circle cx="10" cy="10" r=".6"/><circle cx="10" cy="15.5" r=".6"/></svg>
+  </div>
+  <div id="view"><iframe id="app"></iframe><div id="gh"><img id="ghimg" src="broll/github.png" alt=""></div></div>
+</div>
+
+<p class="say big" id="say2" style="z-index: 4">Where the benchmark is, and what ran.</p>
+<div class="win term" id="t2" style="z-index: 3"><div class="bar"><div class="lights"><i></i><i></i><i></i></div><span id="t2title"></span></div><div class="body" id="t2body"></div></div>
+<p class="say note" id="note2" style="z-index: 4"></p>
+
+<script src="vendor/xterm.js"></script>
+<script>
+(async () => {
+const Q = new URLSearchParams(location.search);
+const P = (k, d) => parseFloat(Q.get(k) || d);
+const TB = P('tb', 6.3);        // browser window comes forward
+const TG = P('tg', 32.2);       // benchmark page on GitHub
+const TT = P('tt', 34.5);       // benchmark terminal session
+const TS = P('ts', 40.9);       // score card
+const SPEED = Q.get('speed') || '4', LEAD = P('lead', 6.7);
+const $ = (id) => document.getElementById(id);
+const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
+const ease = (q) => q * q * (3 - 2 * q);
+
+const MENUS = { Terminal: 'Shell  Edit  View  Window  Help', Chrome: 'File  Edit  View  History  Bookmarks  Tab  Window  Help' };
+const setApp = (name) => { if ($('appname').textContent !== name || !$('menus').textContent) { $('appname').textContent = name; $('menus').innerHTML = MENUS[name].split('  ').join('<span style="display:inline-block;width:22px"></span>'); } };
+
+function mkTerm(body, cast, size) {
+  const term = new Terminal({
+    cols: cast.cols, rows: cast.rows, fontFamily: '"SF Mono", Menlo, Monaco, monospace', fontSize: size, lineHeight: 1.15,
+    cursorBlink: false, cursorStyle: 'block', cursorInactiveStyle: 'block', scrollback: 0, disableStdin: true,
+    theme: { background: '#1d1d1d', foreground: '#e6e6e6', cursor: '#b4b4b4', cursorAccent: '#1d1d1d' },
+  });
+  term.open(body);
+  const ev = cast.events;
+  return { term, ev, idx: 0, t0: ev[0][0], span: ev[ev.length - 1][0] - ev[0][0], text: '' };
+}
+async function feed(T, ct) {                 // write every recorded chunk whose time has come, bytes untouched
+  let wrote = false;
+  while (T.idx < T.ev.length && T.ev[T.idx][0] - T.t0 <= ct) {
+    const raw = atob(T.ev[T.idx][1]);
+    T.text += raw;
+    await new Promise((r) => T.term.write(Uint8Array.from(raw, (c) => c.charCodeAt(0)), r));
+    T.idx++; wrote = true;
+  }
+  return wrote;
+}
+const raf = () => new Promise((r) => { let done = false; const f = () => { if (!done) { done = true; r(); } }; requestAnimationFrame(f); setTimeout(f, 60); });
+
+const [c1, c2] = await Promise.all(['intro', 'bench'].map(async (n) => (await fetch(`/replay/${n}.cast.json`)).json()));
+await Promise.all([document.fonts.load('44px "CMU Serif"'), document.fonts.load('italic 23px "CMU Serif"'), document.fonts.load('20px Menlo'), $('ghimg').decode()]);
+const A = mkTerm($('t1body'), c1, 20), B = mkTerm($('t2body'), c2, 18);
+const A0 = 0.3, B0 = TT + 0.35;                               // film time each session starts
+const sA = Math.max(1, A.span / (TB - 0.45 - A0));            // the link is on screen just before the browser opens
+const sB = Math.max(1, B.span / (TS - 1.6 - B0));             // leaves time to read the table
+const x = (s) => (Math.round(s * 10) / 10).toString();
+$('note1').textContent = `A real shell session, recorded and replayed at ${x(sA)}x.`;
+$('note2').textContent = `A real shell session, recorded and replayed at ${x(sB)}x.`;
+$('t2title').textContent = `weaver — zsh — ${c2.cols}×${c2.rows}`;
+for (const [w, top] of [['t1', 0], ['t2', 0]]) { const el = $(w); el.style.marginLeft = -el.offsetWidth / 2 + 'px'; }
+const place = (win, say, note, mid) => {
+  const h = $(win).offsetHeight, top = Math.round(mid - h / 2);
+  $(win).style.top = top + 'px'; if (say) $(say).style.top = top - 84 + 'px'; $(note).style.top = top + h + 22 + 'px';
+};
+place('t1', 'say1', 'note1', 560); place('t2', 'say2', 'note2', 556);
+
+const app = $('app');
+app.src = `/?replay=run.jsonl&speed=${SPEED}&lead=${LEAD}&outro=${TS - 0.25}&broll=0&capture`;
+await new Promise((r) => { const iv = setInterval(() => { try { if (app.contentWindow.__ready === true) { clearInterval(iv); r(); } } catch (e) {} }, 30); });
+
+const pop = (el, q, max = 1) => { el.style.opacity = max * q; el.style.transform = `scale(${0.965 + 0.035 * ease(q)})`; };
+window.__frame = async (ms) => {
+  const t = ms / 1000;
+  app.contentWindow.__frame(ms);                               // the app runs on the same clock from 0
+
+  const inBrowser = t >= TB && !(t >= TT && t < TS);
+  setApp(inBrowser ? 'Chrome' : 'Terminal');
+  // intro terminal
+  pop($('t1'), t > TB + 0.5 ? 0 : clamp(t / 0.25, 0, 1));
+  $('say1').style.opacity = clamp((t - 0.15) / 0.4, 0, 1) * clamp((TB - t) / 0.2, 0, 1);
+  $('note1').style.opacity = 0.8 * clamp((t - 0.4) / 0.4, 0, 1) * clamp((TB - t) / 0.2, 0, 1);
+  $('t1title').textContent = `${A.text.includes('MacBook-Air my-app %') ? 'my-app' : 'demo'} — zsh — ${c1.cols}×${c1.rows}`;
+  // browser
+  const behind = clamp((t - TT) / 0.25, 0, 1) * clamp((TS - t) / 0.25, 0, 1);
+  pop($('browser'), clamp((t - TB) / 0.28, 0, 1), 1 - 0.95 * behind);
+  const gh = t >= TG && t < TS - 0.1;
+  $('gh').style.display = gh ? 'block' : 'none';
+  $('tabB').style.display = t >= TG ? 'flex' : 'none';
+  $('tabA').className = gh ? 'tab' : 'tab on'; $('tabB').className = gh ? 'tab on' : 'tab';
+  $('url').textContent = gh ? 'github.com/OWASP-Benchmark/BenchmarkPython' : '127.0.0.1:8765';
+  $('omni-ico').innerHTML = gh ? '<rect x="5" y="9" width="10" height="7" rx="1.5"/><path d="M7.3 9V6.8a2.7 2.7 0 0 1 5.4 0V9"/>' : '<circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 6.2v.2"/>';
+  if (gh) $('ghimg').style.transform = `translateY(${-ease(clamp((t - TG - 0.5) / (TT - TG - 0.5), 0, 1)) * 330}px)`;
+  // benchmark terminal
+  const q2 = clamp((t - TT) / 0.22, 0, 1) * clamp((TS - t) / 0.2, 0, 1);
+  pop($('t2'), q2);
+  $('say2').style.opacity = q2; $('note2').style.opacity = 0.85 * q2;
+
+  if (t < TB) A.term.focus(); else if (t >= TT && t < TS) B.term.focus();
+  const w1 = t < TB + 0.5 ? await feed(A, (t - A0) * sA) : false;
+  const w2 = await feed(B, (t - B0) * sB);
+  if (w1 || w2) { await raf(); await raf(); }
+};
+await feed(A, -1); await feed(B, -1);
+await window.__frame(0); await raf(); await raf();
+window.__speeds = { intro: sA, bench: sB };
+window.__ready = true;
+})();
+</script>
+</body>
+</html>

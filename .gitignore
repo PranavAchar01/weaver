@@ -9,3 +9,4 @@ bench/BenchmarkPython/
 .env*
 *.env
 demo/my-app/
+demo/weaver-demo-45s-v*.mp4

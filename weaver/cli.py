@@ -129,6 +129,40 @@ def watch(args) -> int:
     return 0
 
 
+def bench(args) -> int:
+    """Print the saved benchmark numbers. Reads bench/results.json and bench/baseline.json; runs nothing."""
+    res = json.loads((ROOT / "bench" / "results.json").read_text())
+    base = json.loads((ROOT / "bench" / "baseline.json").read_text())
+    s, cases = res["summary"], res["cases"]
+    auto = {}
+    for c in base["cases"]:
+        auto[c["category"]] = auto.get(c["category"], 0) + (1 if c["fixed"] else 0)
+    print(f"OWASP BenchmarkPython @ {s['benchmark_commit'][:7]}, {s['sampled']}-case sample (first 3 real cases per category)")
+    print()
+    head = f"{'category':<17}{'sampled':>8}{'semgrep found':>15}{'autofix alone':>15}{'weaver mended':>15}{'held':>6}"
+    print(head)
+    cats = []
+    for c in cases:
+        if c["category"] not in cats:
+            cats.append(c["category"])
+    for cat in sorted(cats):
+        rows = [c for c in cases if c["category"] == cat]
+        found = [c for c in rows if c.get("rule_matches_category")]
+        print(f"{cat:<17}{len(rows):>8}{len(found):>15}{auto.get(cat, 0):>15}"
+              f"{sum(c['status'] == 'mended' for c in found):>15}{sum(c['status'] == 'held' for c in found):>6}")
+    n, b = s["flagged_in_benchmark_category"], base["summary"]
+    m, h = s["mended_in_benchmark_category"], s["held_in_benchmark_category"]
+    print(f"{'total':<17}{s['sampled']:>8}{n:>15}{b['fixed']:>15}{m:>15}{h:>6}")
+    print()
+    held = [c["case"] for c in cases if c.get("rule_matches_category") and c["status"] == "held"]
+    by_auto = sum(1 for c in cases if c.get("rule_matches_category") and c["status"] == "mended" and c.get("fixed_by") == "semgrep autofix")
+    print(f"Semgrep autofix alone  {b['fixed']:>2} / {b['cases']}  {round(100 * b['fixed'] / b['cases']):>3}%")
+    print(f"Weaver                 {m:>2} / {n}  {round(100 * m / n):>3}%   ({by_auto} by Semgrep autofix, {m - by_auto} by LLM patch)")
+    print(f"held for a human       {h:>2}   {' '.join(held)}")
+    print(f"not found by Semgrep   {s['flagged_other_issue_only'] + s['not_flagged']:>2}   stay open")
+    return 0
+
+
 def main() -> int:
     ap = argparse.ArgumentParser(prog="weaver", description="Semgrep finds it. Weaver mends it.")
     sub = ap.add_subparsers(dest="cmd", required=True)
@@ -136,6 +170,9 @@ def main() -> int:
     w.add_argument("path", nargs="?", default=".")
     w.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8765")))
     w.set_defaults(fn=watch)
+    b = sub.add_parser("bench", help="print the saved OWASP Benchmark sample numbers")
+    b.add_argument("--summary", action="store_true", help="per-category table and totals (the default)")
+    b.set_defaults(fn=bench)
     args = ap.parse_args()
     return args.fn(args)
 
