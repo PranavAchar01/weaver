@@ -1,0 +1,67 @@
+@font-face { font-family: "CMU Serif"; src: url("fonts/cmu-serif-500-roman.woff2") format("woff2"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "CMU Serif"; src: url("fonts/cmu-serif-500-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+@font-face { font-family: "CMU Serif"; src: url("fonts/cmu-serif-700-roman.woff2") format("woff2"); font-weight: 700; font-style: normal; }
+@font-face { font-family: "CMU Typewriter Text"; src: url("fonts/cmu-typewriter-text-500-roman.woff2") format("woff2"); font-weight: 400; font-style: normal; }
+@font-face { font-family: "CMU Typewriter Text"; src: url("fonts/cmu-typewriter-text-500-italic.woff2") format("woff2"); font-weight: 400; font-style: italic; }
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  background: #000;
+  color: #fff;
+  font-family: "CMU Serif", serif;
+  font-weight: 400;
+  overflow: hidden;
+  -webkit-font-smoothing: antialiased;
+  --u: calc(100vh / 1080);
+}
+
+canvas#web { position: fixed; inset: 0; width: 100vw; height: 100vh; display: block; }
+
+#head { position: fixed; left: calc(60 * var(--u)); top: calc(34 * var(--u)); }
+#head h1 { font-size: calc(68 * var(--u)); font-weight: 400; line-height: 1; letter-spacing: 0.01em; }
+#head .tag { font-size: calc(23 * var(--u)); font-style: italic; margin-top: calc(12 * var(--u)); opacity: 0.86; }
+#head .key { font-size: calc(16 * var(--u)); font-style: italic; margin-top: calc(8 * var(--u)); opacity: 0.5; }
+
+#nums {
+  position: fixed; top: calc(40 * var(--u)); right: calc(56 * var(--u)); width: calc(640 * var(--u));
+  display: flex; justify-content: space-between; align-items: flex-end;
+  padding-bottom: calc(18 * var(--u)); border-bottom: 1px solid rgba(255, 255, 255, 0.28);
+}
+#nums div { display: flex; flex-direction: column; }
+#nums b { font-size: calc(62 * var(--u)); font-weight: 400; line-height: 1; font-variant-numeric: lining-nums; }
+#nums i { font-size: calc(17 * var(--u)); margin-top: calc(8 * var(--u)); opacity: 0.62; }
+
+#ledger {
+  position: fixed; top: calc(156 * var(--u)); right: calc(56 * var(--u)); width: calc(640 * var(--u));
+  bottom: calc(26 * var(--u)); list-style: none; overflow: hidden;
+}
+#ledger li { padding: calc(7 * var(--u)) 0 calc(8 * var(--u)); border-bottom: 1px solid rgba(255, 255, 255, 0.13); }
+#ledger .l1 { display: flex; justify-content: space-between; gap: calc(14 * var(--u)); font-size: calc(16.5 * var(--u)); line-height: 1.3; white-space: nowrap; }
+#ledger .rule { overflow: hidden; text-overflow: ellipsis; }
+#ledger .where { font-style: italic; opacity: 0.72; flex: none; }
+#ledger pre {
+  font-family: "CMU Typewriter Text", monospace; font-size: calc(13.5 * var(--u)); line-height: 1.32;
+  margin: calc(4 * var(--u)) 0 calc(3 * var(--u)); white-space: pre; overflow: hidden;
+}
+#ledger pre span { display: block; overflow: hidden; text-overflow: ellipsis; }
+#ledger pre .del { opacity: 0.42; }
+#ledger .ver { display: flex; justify-content: space-between; font-size: calc(15.5 * var(--u)); font-style: italic; line-height: 1.3; white-space: nowrap; }
+#ledger .ver .steps { opacity: 0.9; }
+#ledger .ver .meta { opacity: 0.55; font-style: normal; font-family: "CMU Typewriter Text", monospace; font-size: calc(13 * var(--u)); }
+#ledger li.pending .ver .steps { opacity: 0.5; }
+#ledger li.held .ver .steps { text-decoration: underline; text-underline-offset: 3px; }
+
+#closing {
+  position: fixed; top: calc(250 * var(--u)); right: calc(56 * var(--u)); width: calc(640 * var(--u));
+  opacity: 0; pointer-events: none;
+}
+#closing p { font-size: calc(50 * var(--u)); line-height: 1.34; }
+#closing p:first-child { font-style: italic; opacity: 0.7; margin-bottom: calc(22 * var(--u)); }
+
+#foot { position: fixed; left: calc(60 * var(--u)); bottom: calc(30 * var(--u)); width: calc(470 * var(--u)); }
+#commit { font-size: calc(24 * var(--u)); line-height: 1.25; min-height: calc(54 * var(--u)); opacity: 0; display: flex; flex-direction: column; justify-content: flex-end; }
+#commit code { font-family: "CMU Typewriter Text", monospace; font-size: calc(20 * var(--u)); white-space: nowrap; }
+#status { font-size: calc(17 * var(--u)); font-style: italic; opacity: 0.66; margin-top: calc(10 * var(--u)); min-height: calc(22 * var(--u)); white-space: nowrap; }
+#corner { font-size: calc(14 * var(--u)); opacity: 0.45; margin-top: calc(6 * var(--u)); min-height: calc(18 * var(--u)); }

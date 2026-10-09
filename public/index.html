@@ -1,1 +1,41 @@
-<!doctype html><title>Weaver</title>
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Weaver</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<canvas id="web"></canvas>
+
+<header id="head">
+  <h1>Weaver</h1>
+  <p class="tag">A spider never files a ticket. It mends the web.</p>
+  <p class="key">Each strand is a file. A torn strand is a Semgrep finding.</p>
+</header>
+
+<section id="nums">
+  <div><b id="n-open">0</b><i>tears open</i></div>
+  <div><b id="n-mended">0</b><i>mended</i></div>
+  <div><b id="n-median">&nbsp;</b><i>median time to mend</i></div>
+</section>
+
+<ol id="ledger"></ol>
+
+<div id="closing">
+  <p>Continuous remediation.</p>
+  <p>Semgrep finds it.</p>
+  <p>Weaver mends it.</p>
+  <p>Tests prove it.</p>
+</div>
+
+<footer id="foot">
+  <p id="commit"></p>
+  <p id="status"></p>
+  <p id="corner"></p>
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>
