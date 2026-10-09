@@ -34,7 +34,7 @@ watch it get mended:
 `./demo/reset.sh` puts the target back to its torn state.
 
 To replay the recorded run in the real UI:
-http://127.0.0.1:8765/?replay=run.jsonl&speed=1.75
+http://127.0.0.1:8765/?replay=run.jsonl&speed=1.9
 
 ## What is real
 
@@ -75,9 +75,11 @@ the first attempt in about 41 s. Then `demo/introduce.sh` committed a SQL
 injection, Weaver found it and mended it in 9.5 s. Final: 0 open, 8 mended,
 median 21.9 s from tear to mend. No fix was held in this run.
 
-`demo/weaver-demo-45s.mp4` is the real UI replaying that file at 1.75x, captured
-frame by frame (`demo/capture.py`). Nothing is added to the events. The closing
-captions are overlaid by the UI.
+`demo/weaver-demo-45s.mp4` is the real UI replaying that file at 1.9x, captured
+frame by frame (`demo/capture.py`). Nothing is added to the events. The ending is
+not part of the run: a grayscale headless capture of the BenchmarkPython
+GitHub page (content unedited, `public/broll/github.png`), then a score card
+whose numbers are read from `bench/results.json`.
 
 ## Independent check
 

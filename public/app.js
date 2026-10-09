@@ -293,7 +293,7 @@ function stepSpider(dt) {
     if (a.type === 'pluck' && !a.fired && p > 0.45) {
       a.fired = true;
       const s = a.strand.seg, A = web.nodes[s.i][s.k], B = web.nodes[s.j][s.k];
-      ripple((A.x + B.x) / 2, (A.y + B.y) / 2, 9, 1.2);
+      ripple((A.x + B.x) / 2, (A.y + B.y) / 2, 15, 1.8);
     }
     if (p < 1) break;
     if (a.type === 'spin') { a.strand.torn = false; a.strand.spin = null; a.strand.fresh = now; }
@@ -579,6 +579,8 @@ function handle(ev, instant) {
 const later = [];
 
 /* ------------------------------------------------------------ feeds */
+const BROLL = 3.7;                       // seconds the benchmark page stays up before the score
+let benchOK = null;
 let replayEvents = null, replayT0 = 0, replayIdx = 0, outroDone = false;
 
 function pump() {
@@ -587,9 +589,10 @@ function pump() {
     while (replayIdx < replayEvents.length && LEAD + (replayEvents[replayIdx].t - replayT0) / SPEED <= now) handle(replayEvents[replayIdx++], false);
     if (!outroDone && OUTRO != null && now >= OUTRO) {
       outroDone = true;
-      fade($('ledger'), 1, 0, 0.6); fade($('closing'), 0, 1, 0.8, 0.35); fade($('commit'), 1, 0, 0.6);
+      if (benchOK !== null) { fade($('film'), 0, 1, 0.45); later.push({ at: now + BROLL, fn: () => { fade($('broll'), 1, 0, 0.3); fade($('score'), 0, 1, 0.45, 0.3); } }); }
     }
   }
+  if (outroDone) { const q = clamp((now - OUTRO) / (BROLL + 0.3), 0, 1); $('broll-img').style.transform = `translateY(${-(q * q * (3 - 2 * q)) * 46.5}%) scale(${1 + 0.03 * q})`; }
   if (commitShownAt > 0 && !outroDone && now - commitShownAt > 9) { fade($('commit'), 1, 0, 0.8); commitShownAt = -99; }
 }
 
@@ -611,7 +614,7 @@ async function boot() {
     document.fonts.load('16px "CMU Typewriter Text"'),
   ]);
   resize(); window.addEventListener('resize', resize);
-  $('closing').style.opacity = 0; $('commit').style.opacity = 0;
+  $('film').style.opacity = 0; $('commit').style.opacity = 0;
   if (REPLAY) {
     const text = await (await fetch('/replay/' + encodeURIComponent(REPLAY))).text();
     replayEvents = text.trim().split('\n').map((l) => JSON.parse(l));
@@ -620,14 +623,13 @@ async function boot() {
     $('corner').textContent = `recorded run, replayed at ${SPEED}x`;
     try {                                   // independent check: numbers come straight from bench/results.json
       const b = (await (await fetch('/bench/results.json')).json()).summary;
-      $('bench').innerHTML =
-        `<b>Independent check.</b> ${esc(b.benchmark.replace(/ \(.*/, ''))}, code we did not write. ` +
-        `Sample: ${b.sampled} real-vulnerability cases, first 3 per category. ` +
-        `Semgrep found the benchmark's vulnerability in ${b.flagged_in_benchmark_category}. ` +
-        `Weaver mended ${b.mended_in_benchmark_category} of ${b.flagged_in_benchmark_category}; ${b.held_in_benchmark_category} held for a human. ` +
-        `In ${b.flagged_other_issue_only} more Semgrep flagged only a different issue, and in ${b.not_flagged} nothing, so those ${b.flagged_other_issue_only + b.not_flagged} stay open. ` +
-        `<i>Mended there means rescan clean and the file compiles. Those cases have no unit tests.</i>`;
-    } catch (e) { $('bench').textContent = ''; }
+      benchOK = b.held_in_benchmark_category === 0 && b.mended_in_benchmark_category === b.flagged_in_benchmark_category;
+      $('score').innerHTML =
+        `<p class="tag">Weaver. Semgrep finds it. Weaver mends it.</p>` +
+        `<p class="big">${b.mended_in_benchmark_category} / ${b.flagged_in_benchmark_category}</p>` +
+        `<p class="what">${benchOK ? 'Every vulnerability' : 'Vulnerabilities'} Semgrep found in our OWASP Benchmark sample, mended.</p>` +
+        `<p class="limit">${b.sampled}-case sample. ${b.flagged_other_issue_only + b.not_flagged} that Semgrep missed stay open. Mended = rescan clean and compiles.</p>`;
+    } catch (e) { benchOK = null; }
   } else {
     const opened = Date.now() / 1000;
     const es = new EventSource('/events');

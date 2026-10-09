@@ -14,7 +14,7 @@ import sys
 from playwright.sync_api import sync_playwright
 
 ap = argparse.ArgumentParser()
-ap.add_argument("--url", default="http://127.0.0.1:8766/?replay=run.jsonl&speed=1.75&outro=38.0&capture")
+ap.add_argument("--url", default="http://127.0.0.1:8766/?replay=run.jsonl&speed=1.9&outro=36.0&capture")
 ap.add_argument("--seconds", type=float, default=45.0)
 ap.add_argument("--fps", type=int, default=30)
 ap.add_argument("--stills", default="")
