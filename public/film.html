@@ -48,21 +48,25 @@ body { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; 
 #omni svg { width: 15px; height: 15px; }
 #view { position: relative; height: 951px; background: #000; overflow: hidden; }
 #view iframe { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; display: block; }
-#gh { position: absolute; inset: 0; background: #fff; overflow: hidden; display: none; }
-#gh img { display: block; width: 100%; filter: grayscale(1); will-change: transform; }
+#gh, #pr { position: absolute; inset: 0; background: #fff; overflow: hidden; display: none; }
+#times { position: absolute; left: 0; right: 0; bottom: 0; background: #000; color: #fff; text-align: center; font-family: "CMU Serif", serif; padding: 20px 0 24px; border-top: 1px solid #555; }
+#times b { display: block; font-size: 38px; font-weight: normal; }
+#times i { display: block; font-size: 23px; color: #c9c9c9; margin-top: 8px; }
+#gh img, #pr img { display: block; width: 100%; filter: grayscale(1); will-change: transform; }
 </style>
 </head>
 <body>
 <div id="menubar"><span class="apple">&#xF8FF;</span><b id="appname">Terminal</b><span id="menus"></span>
   <span class="right"><span>Fri Oct 9</span><span>2:31 PM</span></span></div>
 
-<p class="say big" id="say1" style="top: 96px">What you do: one command in your repo. Then nothing.</p>
+<p class="say big" id="say1" style="top: 96px">A real project: isso, 5.3k stars on GitHub. One command.</p>
 <div class="win term" id="t1" style="z-index: 1"><div class="bar"><div class="lights"><i></i><i></i><i></i></div><span id="t1title"></span></div><div class="body" id="t1body"></div></div>
 <p class="say note" id="note1"></p>
 
 <div class="win" id="browser">
   <div id="tabs"><div class="lights"><i></i><i></i><i></i></div>
     <div class="tab on" id="tabA"><i class="fav"></i><span class="t">Weaver</span><span class="x">&#x2715;</span></div>
+    <div class="tab" id="tabC" style="display: none"><i class="fav"></i><span class="t">Mend 3 Semgrep findings in isso/migrate.py · Pull Request #1 · PranavAchar01/isso</span><span class="x">&#x2715;</span></div>
     <div class="tab" id="tabB" style="display: none"><i class="fav"></i><span class="t">OWASP-Benchmark/BenchmarkPython: OWASP Benchmark for Python</span><span class="x">&#x2715;</span></div>
     <span class="plus">+</span></div>
   <div id="bar">
@@ -72,7 +76,7 @@ body { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; 
     <div id="omni"><svg viewBox="0 0 20 20" id="omni-ico"><circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 6.2v.2"/></svg><span id="url">127.0.0.1:8765</span></div>
     <svg viewBox="0 0 20 20"><circle cx="10" cy="4.5" r=".6"/><circle cx="10" cy="10" r=".6"/><circle cx="10" cy="15.5" r=".6"/></svg>
   </div>
-  <div id="view"><iframe id="app"></iframe><div id="gh"><img id="ghimg" src="broll/github.png" alt=""></div></div>
+  <div id="view"><iframe id="app"></iframe><div id="gh"><img id="ghimg" src="broll/github.png" alt=""></div><div id="pr"><img id="primg" src="broll/pr.png" alt=""><div id="times"><b id="times1"></b><i id="times2"></i></div></div></div>
 </div>
 
 <p class="say big" id="say2" style="z-index: 4">Where the benchmark is, and what ran.</p>
@@ -84,11 +88,13 @@ body { font-family: -apple-system, "SF Pro Text", "Helvetica Neue", sans-serif; 
 (async () => {
 const Q = new URLSearchParams(location.search);
 const P = (k, d) => parseFloat(Q.get(k) || d);
-const TB = P('tb', 6.3);        // browser window comes forward
-const TG = P('tg', 32.2);       // benchmark page on GitHub
-const TT = P('tt', 34.5);       // benchmark terminal session
-const TS = P('ts', 40.9);       // score card
-const SPEED = Q.get('speed') || '4', LEAD = P('lead', 6.7);
+const TB = P('tb', 6.5);
+const TP = P('tp', 24.8);       // the same terminal comes back: stop, push, open the pull request
+const TQ = P('tq', 33.5);       // the pull request page        // browser window comes forward
+const TG = P('tg', 39.5);       // benchmark page on GitHub
+const TT = P('tt', 41.8);       // benchmark terminal session
+const TS = P('ts', 48.2);       // score card
+const SPEED = Q.get('speed') || '3', LEAD = P('lead', 6.9);
 const $ = (id) => document.getElementById(id);
 const clamp = (x, a, b) => Math.max(a, Math.min(b, x));
 const ease = (q) => q * q * (3 - 2 * q);
@@ -118,11 +124,20 @@ async function feed(T, ct) {                 // write every recorded chunk whose
 }
 const raf = () => new Promise((r) => { let done = false; const f = () => { if (!done) { done = true; r(); } }; requestAnimationFrame(f); setTimeout(f, 60); });
 
-const [c1, c2] = await Promise.all(['intro', 'bench'].map(async (n) => (await fetch(`/replay/${n}.cast.json`)).json()));
-await Promise.all([document.fonts.load('44px "CMU Serif"'), document.fonts.load('italic 23px "CMU Serif"'), document.fonts.load('20px Menlo'), $('ghimg').decode()]);
+const [c1, c2] = await Promise.all(['real', 'bench'].map(async (n) => (await fetch(`/replay/${n}.cast.json`)).json()));
+await Promise.all([document.fonts.load('44px "CMU Serif"'), document.fonts.load('italic 23px "CMU Serif"'), document.fonts.load('20px Menlo'), $('ghimg').decode(), $('primg').decode()]);
 const A = mkTerm($('t1body'), c1, 20), B = mkTerm($('t2body'), c2, 18);
 const A0 = 0.3, B0 = TT + 0.35;                               // film time each session starts
-const sA = Math.max(1, A.span / (TB - 0.45 - A0));            // the link is on screen just before the browser opens
+let acc = '', cut1 = 0;                                       // phase 1 ends just after weaver prints its link
+for (const [ct, b] of A.ev) { acc += atob(b); if (acc.includes('http://127.0.0.1:8765')) { cut1 = ct + 0.6; break; } }
+const M = c1.marks, P0 = TP + 0.3, c2a = M.watch_done - 0.4, c2b = M.pr_url_at + 0.25;   // phase 2: Ctrl-C to the PR link
+const sA = Math.max(1, (cut1 - A.t0) / (TB - 0.45 - A0));
+const sP = Math.max(1, (c2b - c2a) / (TQ - 1.3 - P0));
+const castA = (t) => (t < TP ? Math.min(cut1, A.t0 + (t - A0) * sA) : Math.min(c2b, c2a + (t - P0) * sP)) - A.t0;
+const T = await (await fetch('/replay/real-times.json')).json();
+const one = (v) => (Math.round(v * 10) / 10).toFixed(1);
+$('times1').textContent = `scan ${one(T.scan_seconds)} s  ·  finding to verified commit ${one(T.mended[0].seconds)} s  ·  weaver watch to pull request ${Math.round(T.wall_watch_to_pr)} s`;
+$('times2').textContent = `Measured on this run. 25 findings: 3 real, mended. 22 false positives skipped by hand. Tests not run.`;
 const sB = Math.max(1, B.span / (TS - 1.6 - B0));             // leaves time to read the table
 const x = (s) => (Math.round(s * 10) / 10).toString();
 $('note1').textContent = `A real shell session, recorded and replayed at ${x(sA)}x.`;
@@ -136,7 +151,7 @@ const place = (win, say, note, mid) => {
 place('t1', 'say1', 'note1', 560); place('t2', 'say2', 'note2', 556);
 
 const app = $('app');
-app.src = `/?replay=run.jsonl&speed=${SPEED}&lead=${LEAD}&outro=${TS - 0.25}&broll=0&capture`;
+app.src = `/?replay=real-run.jsonl&speed=${SPEED}&lead=${LEAD}&outro=${TS - 0.25}&broll=0&capture`;
 await new Promise((r) => { const iv = setInterval(() => { try { if (app.contentWindow.__ready === true) { clearInterval(iv); r(); } } catch (e) {} }, 30); });
 
 const pop = (el, q, max = 1) => { el.style.opacity = max * q; el.style.transform = `scale(${0.965 + 0.035 * ease(q)})`; };
@@ -144,36 +159,46 @@ window.__frame = async (ms) => {
   const t = ms / 1000;
   app.contentWindow.__frame(ms);                               // the app runs on the same clock from 0
 
-  const inBrowser = t >= TB && !(t >= TT && t < TS);
+  const ph2 = t >= TP && t < TQ;
+  const inBrowser = t >= TB && !(t >= TT && t < TS) && !ph2;
   setApp(inBrowser ? 'Chrome' : 'Terminal');
   // intro terminal
-  pop($('t1'), t > TB + 0.5 ? 0 : clamp(t / 0.25, 0, 1));
-  $('say1').style.opacity = clamp((t - 0.15) / 0.4, 0, 1) * clamp((TB - t) / 0.2, 0, 1);
-  $('note1').style.opacity = 0.8 * clamp((t - 0.4) / 0.4, 0, 1) * clamp((TB - t) / 0.2, 0, 1);
-  $('t1title').textContent = `${A.text.includes('MacBook-Air my-app %') ? 'my-app' : 'demo'} — zsh — ${c1.cols}×${c1.rows}`;
+  const q1 = clamp((t - TP) / 0.22, 0, 1) * clamp((TQ - t) / 0.2, 0, 1);
+  pop($('t1'), ph2 ? q1 : t > TB + 0.5 ? 0 : clamp(t / 0.25, 0, 1));
+  for (const id of ['t1', 'say1', 'note1']) $(id).style.zIndex = ph2 ? (id === 't1' ? 3 : 4) : (id === 't1' ? 1 : 0);
+  $('say1').textContent = ph2 ? 'Then one pull request, in a fork. Nothing sent upstream.' : 'A real project: isso, 5.3k stars on GitHub. One command.';
+  $('note1').textContent = `${ph2 ? 'The same' : 'A'} real shell session, recorded and replayed at ${x(ph2 ? sP : sA)}x.`;
+  $('say1').style.opacity = ph2 ? q1 : clamp((t - 0.15) / 0.4, 0, 1) * clamp((TB - t) / 0.2, 0, 1);
+  $('note1').style.opacity = ph2 ? 0.85 * q1 : 0.8 * clamp((t - 0.4) / 0.4, 0, 1) * clamp((TB - t) / 0.2, 0, 1);
+  $('t1title').textContent = `${A.text.includes('MacBook-Air isso %') ? 'isso' : 'work'} — zsh — ${c1.cols}×${c1.rows}`;
   // browser
-  const behind = clamp((t - TT) / 0.25, 0, 1) * clamp((TS - t) / 0.25, 0, 1);
+  const behind = Math.max(clamp((t - TT) / 0.25, 0, 1) * clamp((TS - t) / 0.25, 0, 1), clamp((t - TP) / 0.25, 0, 1) * clamp((TQ - t) / 0.25, 0, 1));
   pop($('browser'), clamp((t - TB) / 0.28, 0, 1), 1 - 0.95 * behind);
   const gh = t >= TG && t < TS - 0.1;
   $('gh').style.display = gh ? 'block' : 'none';
   $('tabB').style.display = t >= TG ? 'flex' : 'none';
-  $('tabA').className = gh ? 'tab' : 'tab on'; $('tabB').className = gh ? 'tab on' : 'tab';
-  $('url').textContent = gh ? 'github.com/OWASP-Benchmark/BenchmarkPython' : '127.0.0.1:8765';
-  $('omni-ico').innerHTML = gh ? '<rect x="5" y="9" width="10" height="7" rx="1.5"/><path d="M7.3 9V6.8a2.7 2.7 0 0 1 5.4 0V9"/>' : '<circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 6.2v.2"/>';
+  const pr = t >= TQ && t < TG;
+  $('pr').style.display = pr ? 'block' : 'none';
+  $('tabC').style.display = t >= TQ ? 'flex' : 'none';
+  $('tabC').className = pr ? 'tab on' : 'tab';
+  if (pr) $('primg').style.transform = `translateY(${-ease(clamp((t - TQ - 1.2) / (TG - TQ - 2.2), 0, 1)) * 250}px)`;
+  $('tabA').className = gh || pr ? 'tab' : 'tab on'; $('tabB').className = gh ? 'tab on' : 'tab';
+  $('url').textContent = gh ? 'github.com/OWASP-Benchmark/BenchmarkPython' : pr ? 'github.com/PranavAchar01/isso/pull/1' : '127.0.0.1:8765';
+  $('omni-ico').innerHTML = gh || pr ? '<rect x="5" y="9" width="10" height="7" rx="1.5"/><path d="M7.3 9V6.8a2.7 2.7 0 0 1 5.4 0V9"/>' : '<circle cx="10" cy="10" r="7"/><path d="M10 9v5M10 6.2v.2"/>';
   if (gh) $('ghimg').style.transform = `translateY(${-ease(clamp((t - TG - 0.5) / (TT - TG - 0.5), 0, 1)) * 330}px)`;
   // benchmark terminal
   const q2 = clamp((t - TT) / 0.22, 0, 1) * clamp((TS - t) / 0.2, 0, 1);
   pop($('t2'), q2);
   $('say2').style.opacity = q2; $('note2').style.opacity = 0.85 * q2;
 
-  if (t < TB) A.term.focus(); else if (t >= TT && t < TS) B.term.focus();
-  const w1 = t < TB + 0.5 ? await feed(A, (t - A0) * sA) : false;
+  if (t < TB || ph2) A.term.focus(); else if (t >= TT && t < TS) B.term.focus();
+  const w1 = t < TB + 0.5 || ph2 ? await feed(A, castA(t)) : false;
   const w2 = await feed(B, (t - B0) * sB);
   if (w1 || w2) { await raf(); await raf(); }
 };
 await feed(A, -1); await feed(B, -1);
 await window.__frame(0); await raf(); await raf();
-window.__speeds = { intro: sA, bench: sB };
+window.__speeds = { intro: sA, pr: sP, bench: sB };
 window.__ready = true;
 })();
 </script>

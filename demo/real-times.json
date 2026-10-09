@@ -1,0 +1,30 @@
+{
+ "cmds": [
+  "cd isso",
+  "weaver watch . --lang python --no-tests",
+  "git log --oneline -3",
+  "git switch -c weaver/mend",
+  "git push -q fork weaver/mend",
+  "gh pr create -R PranavAchar01/isso -B master -H weaver/mend -t \"Mend 3 Semgrep findings in isso/migrate.py\" -F .weaver/pr.md"
+ ],
+ "watch_enter": 4.223,
+ "watch_done": 63.445,
+ "needs_dep_commit": true,
+ "pr_enter": 81.695,
+ "pr_url_at": 85.21,
+ "pr_ok": true,
+ "wall_watch_to_pr": 80.99,
+ "scan_seconds": 3.86,
+ "findings_scanned": 3,
+ "mended": [
+  {
+   "path": "isso/migrate.py",
+   "seconds": 36.1,
+   "commit": "51b9ad0",
+   "verify": "rescan clean \u00b7 compiles",
+   "attempts": 2,
+   "backend": "claude cli"
+  }
+ ],
+ "held": []
+}

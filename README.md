@@ -8,7 +8,26 @@ Built on [Semgrep](https://github.com/semgrep/semgrep).
 
 ![A tear, the spider mending it, the pluck that verifies it](docs/img/weaver.gif)
 
-Full 45 second demo: [demo/weaver-demo-45s.mp4](demo/weaver-demo-45s.mp4) (silent, 1080p).
+Full demo, 54 seconds: [demo/weaver-demo-60s.mp4](demo/weaver-demo-60s.mp4) (silent, 1080p). The earlier 45 second cut is [demo/weaver-demo-45s.mp4](demo/weaver-demo-45s.mp4).
+
+## A real run on a real project
+
+The demo runs Weaver on [isso](https://github.com/isso-comments/isso), an open-source comment server with 5.3k GitHub stars, pinned at commit `413d447`.
+
+| | |
+|---|---|
+| Semgrep findings in the repo (253 registry rules) | 25 |
+| Real, mended by Weaver | 3, all in `isso/migrate.py` (lines 15, 85, 207: XML import dumps parsed with `xml.etree`) |
+| Held for a human | 0 |
+| Skipped by hand as false positives | 22 in 7 files |
+| Verified by | Semgrep rescan clean, file compiles. isso's test suite was not run. |
+| Scan time | 3.9 s |
+| Finding to verified commit | 36.1 s (Semgrep autofix tried first and rolled back, then an LLM patch) |
+| `weaver watch` to pull request opened | 81 s |
+| Pull request | [PranavAchar01/isso#1](https://github.com/PranavAchar01/isso/pull/1), opened inside a fork. Nothing was sent upstream. |
+
+One more line in that pull request, adding `defusedxml` to `pyproject.toml`, was written by hand and is marked so.
+The session is recorded in `demo/real.cast.json`, Weaver's event log in `demo/real-run.jsonl`, the times in `demo/real-times.json`; `demo/record_real.py` is the script that ran it.
 
 ## What it is
 

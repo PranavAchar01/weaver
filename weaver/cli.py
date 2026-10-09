@@ -100,25 +100,35 @@ def watch(args) -> int:
     langs, packs = [], []
     for f in files:
         hit = PACKS.get(os.path.splitext(f)[1])
+        if hit and args.lang and hit[0].lower() != args.lang.lower():
+            continue
         if hit and hit[0] not in langs:
             langs.append(hit[0])
             packs.append(hit[1] if isinstance(hit[1], Path) else registry_pack(hit[1]))
     if not packs:
         print("weaver: no Python, JavaScript or TypeScript files to watch here", file=sys.stderr)
         return 2
-    tests = detect_tests(repo, files)
+    skipfile = repo / ".weaver" / "skip"
+    if skipfile.exists():
+        args.skip += [x.strip() for x in skipfile.read_text().splitlines() if x.strip() and not x.startswith("#")]
+    tests = "none" if args.no_tests else detect_tests(repo, files)
     verify = {"pytest": "rescan + pytest", "npm": "rescan + npm test",
               "none": "rescan + compile only (no tests found)"}[tests]
+    if args.no_tests:
+        verify = "rescan + compile only (tests not run)"
 
     url = f"http://127.0.0.1:{args.port}"
     print(f"weaver: semgrep {version}, {sum(count_rules(p) for p in packs)} rules ({', '.join(langs)})")
     print(f"weaver: watching {repo.name} ({len(files)} files), verify: {verify}")
+    if args.skip:
+        print(f"weaver: skipping {len(args.skip)} paths marked false positive by hand")
     print(f"weaver: {url}", flush=True)
 
     os.environ.update(
         WEAVER_TARGET=str(repo),
         WEAVER_RULES=os.pathsep.join(str(p) for p in packs),
         WEAVER_TESTS=tests,
+        WEAVER_EXCLUDE=os.pathsep.join(args.skip),
         WEAVER_EVENTS=str(repo / ".weaver" / "events.jsonl"),
         WEAVER_SEMGREP=semgrep,
     )
@@ -169,6 +179,9 @@ def main() -> int:
     w = sub.add_parser("watch", help="watch a git repo and mend what Semgrep finds")
     w.add_argument("path", nargs="?", default=".")
     w.add_argument("--port", type=int, default=int(os.environ.get("PORT", "8765")))
+    w.add_argument("--lang", help="only watch one language, e.g. python")
+    w.add_argument("--no-tests", action="store_true", help="verify by rescan + compile only; do not run the repo's tests")
+    w.add_argument("--skip", action="append", default=[], help="path to leave alone (also read from .weaver/skip, one per line)")
     w.set_defaults(fn=watch)
     b = sub.add_parser("bench", help="print the saved OWASP Benchmark sample numbers")
     b.add_argument("--summary", action="store_true", help="per-category table and totals (the default)")

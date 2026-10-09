@@ -56,7 +56,9 @@ TEST_CMD = (
 )
 MAX_ATTEMPTS = 3
 MEMORY = os.environ.get("WEAVER_MEMORY", "1") != "0"  # write a Semgrep rule after each verified mend
-SCAN_EXCLUDES = ["tests", "exploits", ".weaver", "node_modules"]
+SCAN_EXCLUDES = ["tests", "exploits", ".weaver", "node_modules"] + [
+    x for x in os.environ.get("WEAVER_EXCLUDE", "").split(os.pathsep) if x
+]
 
 events: list[dict] = []
 events_lock = threading.Lock()
