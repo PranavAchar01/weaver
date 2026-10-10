@@ -129,6 +129,7 @@ The full list and how each stage works: [docs/DETAILS.md](docs/DETAILS.md).
 - Amazon S3: the ledger of verified mends.
 - Claude, through the Claude Code CLI: patches and rule drafts.
 - Amazon Bedrock: supported, not used in the recorded run.
+- Guild AI: an optional reviewer agent (`guild/weaver-review/agent.ts`) that signs off on each patch before the commit, called from `weaver/guild.py`. Off unless `~/.config/weaver/guild.env` is set. Not used in the recorded run or the benchmark.
 - xterm.js, FastAPI, and Computer Modern for the type.
 
 Built for the tokens& Cyberdefense Hackathon, 2026-10-09.

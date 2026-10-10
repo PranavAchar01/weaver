@@ -65,10 +65,9 @@ def detect_tests(repo: Path, files: list[str]) -> str:
 
 
 def load_aws_env():
-    """Credentials stay in the operator's own file; they are read into the process and never printed."""
-    if not AWS_ENV.exists():
-        return
-    for line in AWS_ENV.read_text().splitlines():
+    """Credentials stay in the operator's own files; they are read into the process and never printed."""
+    lines = [x for f in (AWS_ENV, AWS_ENV.with_name("guild.env")) if f.exists() for x in f.read_text().splitlines()]
+    for line in lines:
         line = line.strip().removeprefix("export ").strip()
         if line and not line.startswith("#") and "=" in line:
             k, v = line.split("=", 1)

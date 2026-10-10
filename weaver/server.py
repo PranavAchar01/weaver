@@ -26,7 +26,7 @@ from fastapi import FastAPI
 from fastapi.responses import FileResponse, StreamingResponse
 from fastapi.staticfiles import StaticFiles
 
-from . import aws
+from . import aws, guild
 
 ROOT = Path(__file__).resolve().parent.parent
 TARGET = Path(os.environ.get("WEAVER_TARGET", ROOT / "target")).resolve()
@@ -598,6 +598,24 @@ class Weaver:
                     worked_before=before,
                     attempt=attempt,
                 )
+            guild_session = None
+            if ok and guild.enabled():
+                verdict = guild.review(tear["rule"], path, d)
+                guild_session = verdict["session"]
+                if verdict["verdict"] == "reject":
+                    ok = False
+                detail = f"guild review: {verdict['verdict']}"
+                checks.append(detail)
+                emit(
+                    "verify",
+                    id=tid,
+                    step="guild",
+                    ok=ok,
+                    detail=detail,
+                    note=verdict["reason"],
+                    session=guild_session,
+                    attempt=attempt,
+                )
             if ok:
                 rules = ", ".join(tear["rules"])
                 git("add", "--", path)
@@ -635,6 +653,7 @@ class Weaver:
                         "torn_at": tear["t"],
                         "mended_at": round(time.time(), 3),
                         "seconds_to_mend": seconds,
+                        "guild_session": guild_session,
                     }
                 )
                 self.remember(tear, path, original, new, commit)
