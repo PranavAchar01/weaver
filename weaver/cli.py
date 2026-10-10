@@ -120,7 +120,7 @@ def watch(args) -> int:
     print(f"weaver: semgrep {version}, {sum(count_rules(p) for p in packs)} rules ({', '.join(langs)})")
     print(f"weaver: watching {repo.name} ({len(files)} files), verify: {verify}")
     if args.skip:
-        print(f"weaver: skipping {len(args.skip)} paths marked false positive by hand")
+        print(f"weaver: skipping {len(args.skip)} paths listed in .weaver/skip")
     print(f"weaver: {url}", flush=True)
 
     os.environ.update(
